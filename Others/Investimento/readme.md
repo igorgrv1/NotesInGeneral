@@ -6,7 +6,7 @@ O guia abaixo se trata de um estudo feito por mim (Igor), no intuito de aprender
 
 Nov/2024:
 
-* **[SELIC](https://www.bcb.gov.br/controleinflacao/historicotaxasjuros)**: 10,75% (18/09/2024)
+* **[SELIC](https://www.bcb.gov.br/controleinflacao/historicotaxasjuros)**: 10,75% (Set/2024)
 * **[IPCA](https://www.ibge.gov.br/explica/inflacao.php)**:  4,42% (Set/2024)
 * **[CDI](https://investidor10.com.br/indices/cdi/#:~:text=Qual%20valor%20do%20CDI%20hoje,com%20a%20infla%C3%A7%C3%A3o%20do%20pa%C3%ADs.)**: 11,05%
   * Acumulado 2024: 8,99% (até Oct)
@@ -86,6 +86,8 @@ Helpful Sites:
 * **FIM** - Fundo de Investimentos Multimercado
 * **FIRF** - Fundo de Investimentos em Renda Fixa
 * **Home Broker** - Plataforma digital, na maioria das vezes de uma corretora, onde se compra e vende produtos do mercado financeiro, como ações, produtos  de renda fixa, fundos, etc
+* **IFIX** - Índice dos fundos imobiliários
+* **IMA-B** - Índice do Tesouro IPCA+ (inflação)
 * **IR** - Imposto de Renda
 * **Ibovespa** -  Índice Bovespa: É o mais importante indicador do desempenho médio das  cotações das ações negociadas na B3. É formado pelas ações com maior  volume negociado nos últimos meses
 * **IPCA** - Índice de Preços ao  Consumidor Amplo: Índice que mede o aumento dos preços do país, também  conhecido como o índice oficial que mede a inflação.
@@ -409,3 +411,176 @@ xx
 ### Criptomoedas
 
 xx
+
+
+
+# S&P 500
+
+**Curso**: Finclass - S&P 500 - Índice mais importante do mundo
+
+**Professor**: Felipe Arrais
+
+**O que é?**
+
+* O S&P 500 (Standard Poor's 500) é como **o nosso IBOVESPA**, **um índice** do resultado **das 500 maiores empresas** americanas, feito com uma média ponderada.
+* Empresas que possuem maior valor de mercado, ela também irá influenciar mais o índice
+
+**Por que investir no S&P 500?**
+
+* Do Brasil, temos a **valorização do dólar**, que pode aumentar em ainda mais o lucro das ações!
+* Brasil tem poucas empresas disruptivas, que poderão ganhos exponenciais.
+* Brasil: movimentos <1% das ações de todo o mundo, e ainda sim, o **home bias** no brasil é alto! Brasileiros querem investir somente no brasil.
+
+<img src="./imageResource/brasilCap.png" alt="brasilCap" style="zoom:33%;" />
+
+* **Home Bias** = investir somente no próprio país.
+
+* O S&P **pode ser considerado um índice global**, pois uma vez que ele cai, todas as empresas do mundo também são afetadas
+  * Relação do IBOVESPA vs S&P 500
+
+![ibovespa](./imageResource/ibovespa.png)
+
+![ibovespa2](./imageResource/ibovespa2.png)
+
+
+
+**Composição do S&P 500**
+
+* Setor de **tecnologia é o de maior composição**
+  * Isso varia conforme o tempo, nem sempre foi o de tecnologia
+
+![composicao](./imageResource/composicao.png)
+
+![SP_byDecade_web](./imageResource/SP_byDecade_web.jpg)
+
+
+
+**Quanto Investir**
+
+Variaveis a se considerar:
+
+* **Tempo** que irá precisar do lucro - mínimo de 5 anos reduz a possibildiade de perda
+* **Alocação** da carteira (ao invés de escolher empresas, escolher variar entre setores)
+  * Recomendado:
+    * 50% em ações
+    * 35% Renda Fixa
+    * 15% Fundo Imobiliário
+* **Risco** que pode se assumir
+
+
+
+**Erros comuns**
+
+* Não tente **prever o futuro** para comprar ações
+
+* Não tente **prever o dólar** - INVISTA INDEPENDENTE do valor do dólar, INVISTA SEMPRE
+* Não **pegue dinheiro que não tem** para fazer investimentos
+* Não invista TUDO no S&P 500 - É PARA LONGO PRAZO
+
+
+
+**Gestão Ativa vs Gestão Passiva**
+
+* Analogia do percurso pela Auto Estrada vs Atalho
+  * **Auto Estrada**: caminho seguro e contante, chego em 1h. -> **Gestão Passiva (ETF)**
+  * **Atalho:** caminho instável e variável, chego as vezes 1:05h mas as vezes chego em 20 minutos.
+
+Entender os benefícios do caminho com atalho é que definirá o **quanto estamos dispostos a pegar o atalho**.
+
+
+
+## ETFs
+
+**O que é?**
+
+* ETF, ou **Exchange-Traded Fund** (Fundo de investimento), funciona como uma caixinha, onde o gestor do ETF irá comprar e vender ações.
+* Existem ETFs de todos os tipos:
+  * Games
+  * Cannabis
+  * Armamento
+  * Tecnologia
+
+**Como funciona?**
+
+* O gestor do ETF irá comprar ações que acompanham o índice do S&P 500 por exemplo.
+* O **marketmaker** equilibra o valor do ETF, de forma que se muita gente vender o ETF, o marketmaker irá comprar, e o inverso também é real.
+* ETF é composto por cotas.
+  * Fundo tem 100 cotas, e tem um valor de 100 reais, ou seja, cada cota irá custar R$ 1
+  * Se o fundo valorizar, o valor ir para 150, então cada cota passará R$ 1,50
+
+**Exemplos Famosos**
+
+ETFs do S&P 500:
+
+* IVV
+* VOO
+
+
+
+# Do Mil ao Milhão
+
+**Curso**: Finclass - Do Mil ao Milhão
+
+**Professor**: Thiago Nigro
+
+
+
+## Análise Técnica vs Psicológico
+
+> Você pode ser um expert técnicamente, mas sem um bom psicológico, não irá ganhar dinheiro!
+
+
+
+Em 1977, **Peter Lynch** (um dos maiores investidores), possui um FI que **rentabilizou 29.2% no ano!**  **PORÉM**, 1 de 5 investidores deste fundo ganhou dinheiro! e isso se deve **ao fator emocional**.
+
+* Os investidores **compravam em alta**, **vendiam em baixa** devido ao fator emocional
+
+![emocao](./imageResource/emocao.png)
+
+A **emoção** faz com que **compremos** algo que não pudemos, quando a **razão** quer nos mostrar que muitas vezes **não precisamos**.
+
+
+
+**Teora de Howard Gardner**, nos mostra que cada pessoa possui **um tipo de inteligência**!
+
+* Muitas vezes temos inteligência musical/cinestécica, mas **não temos intrapessoal**, que nos ajuda com **controle emocional, organização financeira**
+
+![gardner](./imageResource/gardner.png)
+
+![gardner2](./imageResource/gardner2.png)
+
+
+
+## Crenças Financeiras
+
+Responder as perguntas:
+
+* Quais as primeiras palavras que vêm na sua mente quando pensa em DINHEIRO?
+  * Viagem, Oportunidade, Prazeres
+* Qual sentimento quando escuta palavra dinheiro?
+  * Tranquilidade
+* Qual lado ruim do dinheiro?
+  * Arrogância
+* O que você acha das pessoas que tem muito dinheiro?
+  * Esforçadas
+* Ter dinheiro é sorte ou privilégio?
+  * Mistura dos dois
+* Dinheiro corrompe pessoas?
+  * Algumas sim, outras não
+* Ter dinheiro dá Trabalho?
+  * Sim!
+* Dinheiro é difícil de conseguir?
+  * Sim!
+* Como seus pais lidavam com dinheiro?
+  * Mal
+* Seus pais te influenciaram de alguma forma?
+  * Sim, não quero seguir as mesmas coisas, quero alcançar antes
+* Como você se sentiria endividade?
+  * Mal, preocupado
+* **FINAL, olhe o que tem de negativo** - irá te atrapalhar no futuro?
+
+
+
+Exemplos de crenças negativas que precisam ser melhoradas:
+
+![crencanegativa](./imageResource/crencanegativa.png)
