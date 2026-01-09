@@ -9,7 +9,7 @@
     "devDependencies": {
         "@types/jquery": "^2.0.42",
         "concurrently": "^5.2.0",
-        "lite-server": "^2.5.4"
+        "lite-server": "^2.6.1"
     },
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
