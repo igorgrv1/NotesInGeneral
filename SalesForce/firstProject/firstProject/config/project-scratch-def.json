@@ -1,7 +1,8 @@
 {
-  "orgName": "igorgomesromerovilela company",
+  "orgName": "igorromero company",
   "edition": "Developer",
   "features": ["EnableSetPasswordInApi"],
+  "hasSamplesData": true,
   "settings": {
     "lightningExperienceSettings": {
       "enableS1DesktopEnabled": true

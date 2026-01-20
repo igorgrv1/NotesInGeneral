@@ -5,8 +5,8 @@
       "default": true
     }
   ],
-  "name": "igorgrv-dev",
+  "name": "firstProject",
   "namespace": "",
   "sfdcLoginUrl": "https://login.salesforce.com",
-  "sourceApiVersion": "55.0"
+  "sourceApiVersion": "65.0"
 }
