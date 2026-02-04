@@ -136,7 +136,7 @@ sf apex test run -c -r human -w 20
 
 
 
-## LWC
+# LWC
 
 LWC = Lightning Web Component
 
@@ -394,3 +394,1040 @@ export default class Test extends LightningElement {
 * `get` -> exige que o método **retorne algo**
 
 <img src="./imageResource/get.png" alt="Screenshot 2026-01-19 at 23.57.39" style="zoom:50%;" />
+
+
+
+### Conditions
+
+No LWC podemos renderizar um componente condicionalmente
+
+```javascript
+lwc:if
+lwc:elseif
+lwc:else
+```
+
+HTML:
+
+```html
+<template>
+  <lightning-button
+      variant="brand"
+      label="Submit"
+      onclick={handleButtn}>
+  </lightning-button>
+  <div lwc:if={isVisible}>
+	  Show the code
+  </div>
+  
+  <!-- example.html -->
+  <template lwc:if={expression1}>
+      Statement 1
+  </template>
+  <template lwc:elseif={expression2}>
+      Statement 2
+  </template>
+  <template lwc:else>
+      Statement 3
+  </template>
+</template>
+```
+
+JS:
+
+```js
+export default class Test extends LightningModal {
+    isVisible = true;
+    
+    handleButtn() {
+        this.isVisible = !this.isVisible
+    }
+}
+```
+
+
+
+### Looping
+
+Para iterar uma lista podemos utilizar o `for:each={array} for:item="currentItem" for:index="index" `
+
+JS:
+
+```js
+export default class Test extends LightningModal {
+    @track carList = ["BMW", "Ferrari"];
+}
+```
+
+HTML:
+
+```html
+  <lightning-card title="Looping Example">
+      <div class="slds-var-m-around_medium">
+          <ul class="slds-has-dividers_around-space">
+              <template for:each={carList} for:item="car">
+                  <li key={car} class="slds-item">{car}</li>
+              </template>
+          </ul>
+      </div>
+  </lightning-card>
+```
+
+
+
+### Component Composition
+
+Composition = add um componente dentro de outro componente
+
+```html
+<!-- De dentro de um componente Pai-->
+
+<!-- se o child chamar childComponentDemo -->
+<c-child-component-demo></c-child-component-demo>
+
+<!-- se o child chamar sampleDemoLWC -->
+<c-sample-demo-l-w-c></c-sample-demo-l-w-c>
+```
+
+
+
+### Shadow Dom
+
+É possível acessar elementos do HTML utilizando `this.template` + `querySelector`
+```js
+.querySelector 		-> para um único elemento
+.querySelectorAll -> para arrays/multiplo elementos
+```
+
+E após acessar o elemento, é possível manipula-lo:
+
+```html
+<template>
+  <h1>Olá</h1>
+  <template for:each={users} for:item="user">
+    <p class="userClass" key="{user}">{user}</p>
+  </template>
+  <lightning-button label="Change HTML with Shadow" onclick={handleClick}></lightning-button>
+</template>
+```
+
+````js
+export default class Test extends LightningModal {
+	@track users = ["Igor", "Romero"];
+  
+  handleClick() {
+    const elem = this.template.querySelector('h1')
+    console.log(elem.innerText) // irá printar Olá
+    
+    const userElement = this.template.querySelectorAll('.name')
+    Array.from(userElements).forEach(item => {
+      console.log(item.innerText) // irá printar Igor/Romero
+    })
+  }
+}
+````
+
+
+
+Outro cenário - controlar o elemento do checkbox
+
+````html
+<input
+  class="multi-select-combobox__input"
+  aria-controls="multi-pick-list-dropdown-items"
+  role="textbox"
+  type="text"
+  value={selectedItems}
+/>
+````
+
+```js
+this.template
+  .querySelector(".multi-select-combobox__input")
+  .addEventListener("click", (event) => {
+    this.handleClick(event.target);
+    event.stopPropagation();
+  });
+```
+
+
+
+Outro cenário para manipular o CSS
+
+````html
+  <div>
+      <li class="createCaseProductListItem" onclick="{!c.choose}" aria-selected="false" >
+````
+
+```js
+let allListItemElements = container.querySelectorAll("li, .createCaseProductListItem");
+  if (keyCode == "40" || keyCode == "38") {
+      for (let i = 0; i < allListItemElements.length; i++) {
+          allListItemElements[i].setAttribute("aria-selected", "false");
+          allListItemElements[i].classList.remove("grayBackground");
+      }
+  }
+```
+
+
+
+#### Toast Notification
+
+É possível acessar um component child com o shadow down! como um **ToastNotification!**
+
+
+
+````html
+<template>    
+    <template if:true={showToastBar}>   
+         <div class="slds-notify_container">    
+            <div class={outerClass} role="status">    
+                <span class="slds-assistive-text">{type}</span>    
+                <span class={innerClass} title={message}>    
+                    <lightning-icon icon-name={getIconName} 
+                        alternative-text="icon" 
+                        styleclass="slds-icon slds-icon_small" 
+                        variant="inverse" 
+                        size="small">
+                    </lightning-icon>    
+                </span>    
+                <div class="slds-notify__content">    
+                    <h2 class="slds-text-heading_small">    
+                        <lightning-formatted-rich-text value={message}></lightning-formatted-rich-text>    
+                    </h2>    
+                </div>       
+                <div class="slds-notify__close">    
+                    <lightning-button-icon icon-name="utility:close" 
+                        size="small" 
+                        variant="border-filled" 
+                        class="slds-button slds-button_icon slds-button_icon-inverse" 
+                        alternative-text="next" 
+                        onclick={closeModal} >
+                    </lightning-button-icon>    
+                </div>    
+            </div>    
+        </div>    
+    </template>   
+</template>
+````
+
+```js
+export default class candidatesSearchAdvancedToast extends LightningElement {
+    type = 'error';
+    icon = '';
+    message = '';    
+    showToastBar = false;
+    
+    @api autoCloseTime = 5000;
+        
+    @api
+    showToast(type, message, icon, time) {
+        this.type = type;
+        this.message = message;
+        this.icon = icon;
+        this.autoCloseTime = time;
+        this.showToastBar = true;
+        if (time > 0 ) {
+            setTimeout(() => {
+                this.closeModal();
+            }, this.autoCloseTime);    
+        }
+    }
+    
+    closeModal() {
+        this.showToastBar = false;
+        this.type = '';
+        this.message = '';
+    }
+ 
+    get getIconName() {
+        if(this.icon){
+            return this.icon;
+        }
+        return 'utility:' + this.type;
+    }
+ 
+    get innerClass() {
+        return 'slds-icon_container slds-icon-utility-' + this.type + ' slds-m-right_small slds-no-flex slds-align-top';
+    }
+ 
+    get outerClass() {
+        return 'slds-notify slds-notify_toast slds-theme_' + this.type;
+    }
+}let allListItemElements = container.querySelectorAll("li, .createCaseProductListItem");
+  if (keyCode == "40" || keyCode == "38") {
+      for (let i = 0; i < allListItemElements.length; i++) {
+          allListItemElements[i].setAttribute("aria-selected", "false");
+          allListItemElements[i].classList.remove("grayBackground");
+      }
+  }
+```
+
+Acessando o child elemento de um parent com shadow dom:
+
+```js
+showErrorToast(errorMessage) {
+    this.template.querySelector("c-candidates-search-advanced-toast")
+      	.showToast("error",errorMessage, "utility:error", 10000);
+}
+```
+
+
+
+
+
+## Style/CSS
+
+SLDS -> Salesforce Lightning Design System
+
+### Inline css
+
+LWC possui suas próprias tags de classes: https://www.lightningdesignsystem.com/2e1ef8501/p/51dd56-margin
+
+Exemplo `slds-m-right_large` 
+
+* Classes prefixed by `slds-**m**-` are used to add margins to an element. Classes prefixed by `slds-**p**-` are used to add [padding](https://www.lightningdesignsystem.com/2e1ef8501/p/93a8e1) to an element.
+* Spacing class names use these direction indicators:`top`, `right`, `bottom`, and `left`.
+* Use the `_xxx-small` through `_xx-large` scale to choose the spacing size needed.
+
+```html
+<lightning-input type="text" placeholder="title" class="slds-m-right_large"></lightning-input>
+
+<div class="slds-m-right_none"></div>
+<div class="slds-m-right_xxx-small"></div>
+<div class="slds-m-right_xx-small"></div>
+<div class="slds-m-right_x-small"></div>
+<div class="slds-m-right_small"></div>
+<div class="slds-m-right_medium"></div>
+<div class="slds-m-right_large"></div>
+<div class="slds-m-right_x-large"></div>
+<div class="slds-m-right_xx-large"></div>
+```
+
+
+
+MAS, também é possível utilizar `style` nos elementos:
+
+```html
+<div style="color:red; font-size:20px">
+  Hi
+</div>
+```
+
+### External css
+
+ou `class` associando a um arquivo CSS!
+
+```HTML
+<!-- helloInLwc.html -->
+<div class="hello">
+  Hi
+</div>
+```
+
+```css
+/* helloInLwc.css -> o nome do arquivo tem q ser igual */
+div {
+  background-color: red
+}
+
+.hello {
+  color: red
+}
+
+.hello:hover {
+  color: blue
+}
+```
+
+
+
+### SDLS Design Token
+
+LWC fornece 'padrões' que podem ser usados no CSS, sem q seja necessário ficar buscando a cor exata usada no SF.
+
+*The SLDS [design tokens](https://v1.lightningdesignsystem.com/design-tokens/) are still present and work normally in SLDS 1 themes, but aren't  included in SLDS 2 themes. SLDS 2 replaces design tokens with a system  of CSS custom variables called global styling hooks.*
+
+
+
+### Shared CSS
+
+Vamos pensar em um cenário onde +1 componente quer usar o mesmo CSS, e no LWC isso é possível com o `@import c/yourComponentCss`
+
+
+
+1. É necessário criar um component LWC, porém com somente a classe css
+
+```css
+/* paragraphGlobal/paragraphGlobal.css */
+p {
+  font-size: 30px
+}
+```
+
+2. Os Components que forem utilizar esse css irão **importa-los**
+
+```css
+@import 'c/paragraphGlobal';
+
+.childCss{
+  width:80%
+}
+```
+
+
+
+### Dynamic CSS
+
+O HTML também permite receber como `style` uma `prop` do component, q pode então ser manipulada no `js`
+
+Exemplo: Alterar o tamanho da div
+
+```html
+<template>
+	<lightning-card title="Dynamic CSS">
+  	<div class="sfds-var-m-around_medium">
+      <lightning-input type="number" value={percent} label="Percentage" onkeyup={changeHandler}>
+      </lightning-input>
+      
+      <!-- here I'm getting the different percentage value -->
+      <div style={percentage} />
+    </div>
+  </lightning-card>
+</template>
+```
+
+```js
+export default class DynamicCss extends LightningElement {
+  percent = 10;
+  changeHandler(e) {
+    this.percent = event.target.value;
+  }
+  
+  get percentage() {
+    return `width:${this.percent}%` // <- retorna o style
+  }
+}
+```
+
+### Alterando CSS de um comp. LWC
+
+Não é possível by default alterar o CSS de um component LWC
+
+```html
+<!-- não irá funcionar! -->
+<lightning-button style="color:red"></lightning-button>
+
+<!-- não irá funcionar! -->
+<lightning-button class="myClass"></lightning-button>
+```
+
+
+
+Para manipular o CSS de um componente LWC é necessario manipular o DOM com o `renderedCallback`
+
+```js
+export default class ManipulatingDom extends LightningElement {
+
+	isLoaded = false
+
+  renderedCallback() {
+      if(this.isLoaded) return
+      const btn = this.template.querySelector('.userBtn');
+      if (btn) {
+          btn.style.backgroundColor = 'red';
+      }
+      this.isLoaded = true
+  }
+}
+```
+
+```html
+<lightning-button class="userBtn"></lightning-button>
+```
+
+
+
+
+
+
+
+## Lifecycle Hooks
+
+![Screenshot 2026-01-31 at 19.32.41](./imageResource/salesforce.png)
+
+Hooks:
+
+```javascript
+constructor()
+
+connectedCallback()
+
+renderedCallback()
+
+disconnetecCallback()
+
+errorCallback()
+```
+
+| Hook                  | Quando roda                        | Para que usar                                  |
+| --------------------- | ---------------------------------- | ---------------------------------------------- |
+| `constructor()`       | Ao criar a instância do componente | Inicializar valores simples e estado           |
+| `connectedCallback()` | Quando o componente entra no DOM   | Buscar dados, registrar listeners, chamar Apex |
+| `renderedCallback()`  | Depois que o HTML é renderizado    | Acessar o DOM, libs externas, medir elementos  |
+
+
+
+### constructor()
+
+**Quando usar**
+
+O `constructor` roda **antes do componente existir no DOM**.
+
+Use para:
+
+- Inicializar variáveis.
+- Definir valores padrão.
+- Fazer setup simples de estado.
+- Nunca acessar DOM aqui.
+
+**Exemplo**
+
+```js
+constructor() {
+    super();
+    this.count = 0;
+    this.isLoading = true;
+}
+```
+
+**Evite no constructor**
+
+```js
+this.template.querySelector(...)
+```
+
+➡️ Aqui ainda **não existe template renderizado**.
+
+
+
+### connectedCallback() / disconnectedCallback
+
+**Quando usar**
+
+Quando o componente é inserido no DOM
+
+Use para:
+
+- Chamar classes/métodos do APEX.
+  - Fazer fetch dos dados
+- Registrar eventos (`window`, `message`, `pubsub`).
+
+Exemplo
+
+```js
+connectedCallback() {
+    this.loadData();
+    window.addEventListener('resize', this.handleResize);
+}
+```
+
+E o cleanup depois:
+
+```js
+disconnectedCallback() {
+    window.removeEventListener('resize', this.handleResize);
+}
+```
+
+* Pode rodar mais de uma vez se o componente for removido e inserido de novo.
+
+
+
+Ou Exemplo
+
+```js
+interval = 0;
+connectedCallback() {
+	this.interval = window.setInterval()
+}
+```
+
+E o cleanup depois:
+
+```js
+disconnectedCallback() {
+	window.clearInterval(this.interval)
+}
+```
+
+
+
+
+
+### renderedCallback()
+
+**Quando usar**
+
+Aqui todo conteúdo HTML já foi carregado, se for o parent, ele espera até mesmo todos os childs carregarem.
+
+Use para:
+
+- Acessar o DOM.
+- Usar `this.template.querySelector`.
+- Inicializar bibliotecas JS externas.
+- Medir tamanho de elementos.
+- Ajustar UI após render.
+
+**Exemplo**:
+
+```js
+renderedCallback() {    
+	const el = this.template.querySelector('.box');
+	if (el) {
+		el.focus();
+	}
+}
+```
+
+* ⚠️ Cuidado com loops no `renderedCallback`
+
+Ele pode rodar **várias vezes**.
+
+Se você alterar estado dentro dele, pode causar loop infinito:
+
+```
+renderedCallback() {
+    this.visible = true; // ⚠️ pode rerender e chamar de novo
+}
+```
+
+Proteção comum
+
+```
+renderedCallback() {
+    if (this.hasRendered) return;
+    this.hasRendered = true;
+
+    // código seguro
+}
+```
+
+
+
+### Exemplos
+
+```js
+import { LightningElement, track } from 'lwc';
+import getAccounts from '@salesforce/apex/AccountController.getAccounts';
+
+export default class AccountList extends LightningElement {
+    @track accounts = [];
+    isLoading = true;
+    hasRendered = false;
+
+    constructor() {
+        super();
+        this.isLoading = true;
+    }
+
+    connectedCallback() {
+        this.loadAccounts();
+    }
+
+    async loadAccounts() {
+        try {
+            const result = await getAccounts();
+            this.accounts = result;
+        } catch (e) {
+            console.error(e);
+        } finally {
+            this.isLoading = false;
+        }
+    }
+
+    renderedCallback() {
+        if (this.hasRendered) return;
+        this.hasRendered = true;
+
+        const searchInput = this.template.querySelector('.search');
+        if (searchInput) {
+            searchInput.focus();
+        }
+    }
+}
+```
+
+
+
+**Caso 2 — Formulário com validação e máscara**
+
+Situação real:
+ Você tem um form de criação de Lead com máscara de telefone.
+
+Onde usar
+
+- `constructor` → inicializa objeto
+- `connectedCallback` → carrega picklists
+- `renderedCallback` → aplica máscara no input
+
+```js
+import { LightningElement } from 'lwc';
+import getPicklists from '@salesforce/apex/LeadController.getPicklists';
+
+export default class LeadForm extends LightningElement {
+    lead = {};
+    hasRendered = false;
+
+    constructor() {
+        super();
+        this.lead = { Name: '', Phone: '' };
+    }
+
+    connectedCallback() {
+        this.loadPicklists();
+    }
+
+    loadPicklists() {
+        getPicklists()
+            .then(result => {
+                this.statusOptions = result;
+            })
+            .catch(console.error);
+    }
+
+    renderedCallback() {
+        if (this.hasRendered) return;
+        this.hasRendered = true;
+
+        const phoneInput = this.template.querySelector('.phone');
+        if (phoneInput) {
+            phoneInput.addEventListener('input', e => {
+                e.target.value = this.formatPhone(e.target.value);
+            });
+        }
+    }
+
+    formatPhone(value) {
+        return value
+            .replace(/\D/g, '')
+            .replace(/(\d{2})(\d)/, '($1) $2')
+            .replace(/(\d{5})(\d)/, '$1-$2');
+    }
+}
+```
+
+Utilizar biblioteca externa
+
+```js
+import { LightningElement } from 'lwc';
+import { loadScript } from 'lightning/platformResourceLoader';
+import chartJs from '@salesforce/resourceUrl/chartjs';
+import getStats from '@salesforce/apex/StatsController.getStats';
+
+export default class Dashboard extends LightningElement {
+    chart;
+    chartJsInitialized = false;
+
+    connectedCallback() {
+        this.loadStats();
+    }
+
+    async loadStats() {
+        this.data = await getStats();
+    }
+
+    renderedCallback() {
+        if (this.chartJsInitialized) return;
+        this.chartJsInitialized = true;
+
+        loadScript(this, chartJs)
+            .then(() => {
+                const ctx = this.template.querySelector('canvas');
+                this.chart = new window.Chart(ctx, {
+                    type: 'bar',
+                    data: this.data
+                });
+            })
+            .catch(console.error);
+    }
+}
+
+```
+
+
+
+## Database
+
+No LWC existem `3 meios de comunicação` com o Banco de Dados
+
+* LDS -> Lightning Data Service
+
+  * Está em Record Page.
+
+    É CRUD simples.
+
+    1 registro.
+
+    Não precisa de lógica.
+
+* LDS Wire 
+
+  * Quer reatividade.
+
+    Parâmetros mudam.
+
+    Pode cachear.
+
+    Lista simples.
+
+* Apex Services
+
+  * Usuário dispara ação.
+
+    Tem filtros dinâmicos.
+
+    Regras complexas.
+
+    DML pesado.
+
+    Fluxo controlado.
+
+![Screenshot 2026-02-02 at 11.05.43](./imageResource/database.png)
+
+
+
+| Critério       | LDS        | Wire            | Apex Imperativo |
+| -------------- | ---------- | --------------- | --------------- |
+| Tipo           | UI API     | Reativo         | Controlado      |
+| Cache          | Automático | Automático      | Não             |
+| FLS / Sharing  | Automático | Depende do Apex | Depende do Apex |
+| Quando executa | Automático | Automático      | Manual          |
+| Complexidade   | Baixa      | Média           | Alta            |
+| Uso comum      | 1 registro | Listas simples  | Lógica complexa |
+| Reatividade    | Sim        | Sim             | Não automático  |
+| Performance    | Alta       | Alta            | Depende         |
+
+**Regra mental rápida**
+
+> **Tela automática? → wire**
+>  **CRUD simples? → LDS**
+>  **Usuário clicou? → Apex imperativo**
+
+Combine:
+
+- LDS para o record principal.
+- Wire para listas.
+- Apex imperativo para ações.
+
+
+
+### LDS
+
+É a forma **nativa da Salesforce** para ler/escrever registros sem Apex.
+
+Você usa APIs como:
+
+- `getRecord`
+- `getFieldValue`
+- `updateRecord`
+- `createRecord`
+- `deleteRecord`
+
+**Quando usar**
+
+- Trabalhar com **1 registro**.
+- Precisa respeitar **FLS / Sharing automaticamente**.
+- Quer **cache automático**.
+- Quer simplicidade.
+- Não precisa de lógica complexa.
+
+![Screenshot 2026-02-02 at 11.04.02](./imageResource/LDS.png)
+
+
+
+#### Como utilizar LDS
+
+| Componente                   | Serve para         |
+| ---------------------------- | ------------------ |
+| `lightning-record-form`      | View + Edit rápido |
+| `lightning-record-view-form` | Apenas leitura     |
+| `lightning-record-edit-form` | Apenas edição      |
+
+
+
+#### **lightning-record-form**
+
+No Exemplo abaixo iremos criar um formulário para ler `Account` object
+
+<img src="./imageResource/recordForm.png" alt="Screenshot 2026-02-03 at 22.40.10" style="zoom:50%;" />
+
+Use quando:
+
+- Quer CRUD rápido.
+- Não precisa de layout custom.
+- Quer respeitar layout padrão.
+- Não precisa lógica extra no submit.
+
+O que faz:
+
+- Exibe registro.
+- Permite editar.
+- Salva.
+- Usa layout Salesforce.
+- Zero Apex.
+
+Fields:
+
+* `object-api-name`: Account/Case and etc :warning: (mandatório)
+* `record-id` : somente quando esta no `edit` (id do Account por exempo)
+* `fields`: é o array de elementos q será exibido :warning: (mandatório)
+* `layout-type`: full/compact
+* `modes`: edit/view/readonly (default é edit/view)
+* `columns`: para definir o tamanho
+* `onsuccess`: chama um método quando há sucesso
+
+```html
+<lightning-record-form
+    record-id={recordId}
+    object-api-name="Account"
+    layout-type="Full"
+    mode="view">
+</lightning-record-form>
+```
+
+
+
+Para utilizar o `object-api-name` e o `fields` é necessário referencia as classes do `@salesforce/schema`
+
+```js
+import ACCOUNT_OBJECT from '@salesforce/schema/Account' // necessario sempre dar um alias ao object
+
+// importar os fields do Account
+import ACCOUNT_NAME from '@salesforce/schema/Account.Name' // precisar seguir como esta no API_NAME
+import ANNUAL_REVENUE_FIELD from '@salesforce/schema/Account.AnnualReveneue'
+
+export default TestLDS extends LightningElement {
+  objectName = ACCOUNT_NAME
+  fieldList = [ACCOUNT_NAME, ANNUAL_REVENUE_FIELD]
+}
+```
+
+```html
+<lightning-record-form
+    object-api-name={objectName}
+		fields={fieldList}
+    layout-type="Full">
+</lightning-record-form>
+```
+
+Dessa forma um CREATE será possível de uma maneira simples!
+
+
+
+Para exibir um record é necessario popular o `record-id`
+
+```html
+<lightning-record-form
+    object-api-name={objectName}
+		fields={fieldList}
+    record-id="0010000002niCSZAAM"
+    layout-type="Full">
+</lightning-record-form>
+```
+
+
+
+
+
+#### ToastNotification
+
+<img src="./imageResource/toast.png" alt="Screenshot 2026-02-03 at 23.02.02" style="zoom:50%;" />
+
+
+
+Para exibir uma msg para o usuário como um 'ToastNotification' podemos utilizar do salesforce tbm + `onsuccess` do próprio form
+
+```html
+<template>
+  <lightning-record-form
+    object-api-name={objectName}
+		fields={fieldList}
+    layout-type="Full"
+		onsucess={successHandler}>
+	</lightning-record-form>
+</template>
+```
+
+```js
+import {showToastEvent} from 'lightning/platformShowToastEvent';
+
+export default TestLDS extends LightningElement {
+  objectName = ACCOUNT_NAME
+  fieldList = [ACCOUNT_NAME, ANNUAL_REVENUE_FIELD]
+  
+  successHandler(event) {
+    const toast = new showToastEvent({
+      title: "Account created",
+      message: "Record ID: " + event.detail.id,
+      variant: "success
+    })
+    this.dispatchEvent(toast)
+  }
+}
+```
+
+
+
+#### @api
+
+Uma outra forma de acessar o `recordId` ou o `objectName` é utilizando o `@api` do salesfoce, que permite dinamicamente acessar o valor
+```js
+import { api } from 'lwc';
+
+//import ACCOUNT_OBJECT from '@salesforce/schema/Account'
+
+export default TestLDS extends LightningElement {
+  @api recordId
+  @api objectApiName
+  // objectName = ACCOUNT_NAME
+}
+```
+
+```html
+<template>
+  <lightning-record-form
+		record-id={recordId}
+    object-api-name={objectApiName}>
+	</lightning-record-form>
+</template>
+```
+
+
+
+#### lightning-record-view-form
+
+Use quando:
+
+- Quer layout custom.
+- Só exibição.
+- Quer usar LDS.
+- Não quer Apex.
+
+Exemplo
+
+```html
+<lightning-record-view-form
+    record-id={recordId}
+    object-api-name="Account">
+    
+    <lightning-output-field field-name="Name"></lightning-output-field>
+    <lightning-output-field field-name="Industry"></lightning-output-field>
+
+</lightning-record-view-form>
+```
+
+
+
+#### lightning-record-edit-form
+
