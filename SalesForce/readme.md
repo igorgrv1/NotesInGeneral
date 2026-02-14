@@ -97,6 +97,25 @@ Push Source
 sf project deploy start
 ```
 
+
+
+Push Source with multiple selected files
+
+```bash
+sf project deploy start \
+  --source-dir force-app/main/default/classes/WorkPrioritizationUserServices.cls \
+  --source-dir force-app/main/default/classes/WorkPrioritizationUserServices.cls-meta.xml \
+  --source-dir force-app/main/default/classes/WorkPrioritizationViewModels.cls \
+  --source-dir force-app/main/default/classes/WorkPrioritizationViewModels.cls-meta.xml \
+  --source-dir force-app/main/default/classes/WorkPrioritizationViewServices.cls \
+  --source-dir force-app/main/default/classes/WorkPrioritizationViewServices.cls-meta.xml \
+  --source-dir force-app/main/default/lwc/wpUserProfileModal
+```
+
+
+
+
+
 Delete Scratch
 
 ```
@@ -328,7 +347,11 @@ Exemplo `slds-m-right_large`
 
 
 
-### @track
+## @track
+
+Track serve para propriedades reativa / altera somente oq de fato foi mexido em uma lista por exemplo.
+
+
 
 Quando queremos manipular uma variável `js` no HTML, podemos fazer o uso do `{}`, PORÉM, se tentarmos manipular uma **variável** **complexa**, como um **objeto ou array**, não irá funcionar!
 
@@ -676,11 +699,11 @@ showErrorToast(errorMessage) {
 
 
 
-## Style/CSS
+# Style/CSS
 
 SLDS -> Salesforce Lightning Design System
 
-### Inline css
+## Inline css
 
 LWC possui suas próprias tags de classes: https://www.lightningdesignsystem.com/2e1ef8501/p/51dd56-margin
 
@@ -714,7 +737,7 @@ MAS, também é possível utilizar `style` nos elementos:
 </div>
 ```
 
-### External css
+## External css
 
 ou `class` associando a um arquivo CSS!
 
@@ -742,7 +765,7 @@ div {
 
 
 
-### SDLS Design Token
+## SDLS Design Token
 
 LWC fornece 'padrões' que podem ser usados no CSS, sem q seja necessário ficar buscando a cor exata usada no SF.
 
@@ -750,7 +773,7 @@ LWC fornece 'padrões' que podem ser usados no CSS, sem q seja necessário ficar
 
 
 
-### Shared CSS
+## Shared CSS
 
 Vamos pensar em um cenário onde +1 componente quer usar o mesmo CSS, e no LWC isso é possível com o `@import c/yourComponentCss`
 
@@ -777,7 +800,7 @@ p {
 
 
 
-### Dynamic CSS
+## Dynamic CSS
 
 O HTML também permite receber como `style` uma `prop` do component, q pode então ser manipulada no `js`
 
@@ -852,7 +875,7 @@ export default class ManipulatingDom extends LightningElement {
 
 
 
-## Lifecycle Hooks
+# Lifecycle Hooks
 
 ![Screenshot 2026-01-31 at 19.32.41](./imageResource/salesforce.png)
 
@@ -1157,7 +1180,218 @@ export default class Dashboard extends LightningElement {
 
 
 
-## Database
+# Communication between components
+
+Existem alguns modos:
+
+* Parent to child
+* Child to Parent
+* Sibling (using pubs)
+
+
+
+## Parent to Child
+
+É possível se comunicar através de:
+
+* Passando dados primitivos/non-primitivos para o child
+* Passando dados por uma **action do Parent**
+* Chamando métodos do child pelo Parent
+
+
+
+### @api
+
+`@api` torna a **propriedade/method** publicos.
+
+* propriedades 'public' são reativas, se for alterada o component é re-renders.
+
+
+
+Para que o **Child** tenha acesso a propriedade, usamos o `@api` no **Parent**
+
+```js
+// Parent.js
+import { LightningElement, api } from "lwc";
+
+export default class Parent extends LightningElement {
+  @api fullname
+  @api cardHeading
+}
+```
+
+```html
+<!-- Parent.html -->
+<template>
+	<c-child-component>
+  	fullname="Adding text from Parent"
+    card-heading="Title of the card from Parent"
+  </c-child-component>
+</template>
+
+
+
+<!-- ChildComponent.html -->
+<template>
+	<lightning-card title={cardHeading}>
+  	{fullname}
+  </lightning-card>
+</template>
+```
+
+
+
+
+
+**PORÉM**, se o Parent quer passar **dados complexos (array/objects)** o `@api` deve então ficar no child e não no Parent
+
+```js
+// Parent.js
+import { LightningElement, api } from "lwc";
+
+export default class Parent extends LightningElement {
+  carsData = [
+    {
+      name: 'mercedes',
+      model: 'amg'
+    },
+    {
+      name: 'mercedes',
+      model: 'formula1'
+    }
+  ]
+}
+
+// Child.js -> AQUI IRÁ VIR O @API
+export default class ChildComponent extends LightningElement {
+  @api carDetails
+}
+```
+
+```html
+<!-- Parent.html -->
+<template>
+  
+  <!-- property do CHILD é chamado DENTRO do component -->
+	<c-child-component car-details={carsData}> </c-child-component>
+</template>
+
+
+
+<!-- ChildComponent.html -->
+<template>
+	<lightning-card title={cardHeading}>
+  	<template for:each{carDetails} for:item="item">
+      <p>
+        {item.name} - {item.model}
+      </p>
+    </template>
+  </lightning-card>
+</template>
+```
+
+
+
+### On Action from Parent
+
+
+
+E se quisermos que a change de um **input do Parent** reflita no comportamento do child?
+
+<img src="./imageResource/parentchild.png" alt="Screenshot 2026-02-13 at 16.05.37" style="zoom:50%;" />
+
+Exemplo: *Input no Parent altere o progress-bar do child*
+
+```js
+// Parent.js
+import { LightningElement, api } from "lwc";
+
+export default class Parent extends LightningElement {
+  parentPercentage=10
+  
+  changehandler(event) {
+    this.parentPercentage = event.target.value
+  }
+}
+
+// Child.js -> AQUI IRÁ VIR O @API
+export default class ChildComponent extends LightningElement {
+  @api percentageChild
+}
+```
+
+```html
+<!-- Parent.html -->
+<template>
+
+  <lightning-input type="number" label="Change progress" onkeyup={changehandler}></lightning-input>
+
+  <!-- property do CHILD é motificada por uma property do Parent -->
+	<c-progress-bar>
+  	percentage-child={parentPercentage}  
+  </c-child-component>
+</template>
+
+
+
+<!-- ProgressBar.html -->
+<template>
+	<lightning-progress-bar value={percentageChild} size="large"></lightning-progress-bar>
+</template>
+```
+
+
+
+
+
+
+
+### Calling Child method from Parent
+
+
+
+E se quisermos chamar o método de um Child através de um Parent?
+
+* Com o uso do `this.template.queryselector` podemos invocar o método do child!
+* Método do Child precisa também ter a anotação `@api`
+
+
+
+```js
+// Child.js
+export default class ChildComponent extends LightningElement {
+  sliderValue = 20
+  
+  sliderHandler(event) {
+    this.sliderValue = event.target.value
+  }
+  
+  // O método precisa ser anotado com @api
+  @api resetSlider() {
+    this.sliderValue = 50
+  }
+}
+
+// Parent.js
+import { LightningElement, api } from "lwc";
+
+export default class Parent extends LightningElement { 
+  
+  // do Parent, com o querySelector, conseguimos acessar o component e chamar o método
+  // o component child precisar estar no HTML do parent!
+  onClickHandler(event) {
+		this.template.queryselector('c-child-slider-component').resetSlider()
+  }
+}
+```
+
+
+
+
+
+
+
+# Database
 
 No LWC existem `3 meios de comunicação` com o Banco de Dados
 
@@ -1431,3 +1665,214 @@ Exemplo
 
 #### lightning-record-edit-form
 
+Funciona de forma parecida
+
+```html
+<lightning-record-edit-form
+    record-id={recordId}
+    object-api-name="Account"
+    onsuccess={handleSuccess}
+    onsubmit={handleSubmit}>
+
+    <lightning-input-field field-name="Name"></lightning-input-field>
+    <lightning-input-field field-name="Industry"></lightning-input-field>
+
+    <lightning-button type="submit" label="Salvar"></lightning-button>
+
+</lightning-record-edit-form>
+```
+
+```js
+handleSubmit(event) {
+    event.preventDefault();
+    const fields = event.detail.fields;
+    fields.Custom__c = 'Valor';
+    this.template.querySelector('lightning-record-edit-form').submit(fields);
+}
+```
+
+
+
+Ou podemos fazer de forma customizada sem usar `handleSubmit`:
+
+```js
+import CONTACT_OBJECT from '@salesforce/schema/Contact'
+
+import CONTACT_NAME from '@salesforce/schema/Contact.Name'
+import CONTACT_TITLE from '@salesforce/schema/Contact.Title'
+
+export default TestLDS extends LightningElement {
+  objectName = CONTACT_OBJECT
+  fields={
+    name: CONTACT_NAME,
+    title: CONTACT_TITLE
+  }
+  
+  successHandler(event) {
+    const toast = new showToastEvent({
+      title: "Account created",
+      message: "Record ID: " + event.detail.id,
+      variant: "success
+    })
+    this.dispatchEvent(toast)
+  }
+}
+```
+
+```html
+<lightning-record-edit-form
+    object-api-name={objectName}
+    onsuccess={handleSuccess}>
+
+  	<!-- TO SHOW MESSAGE -->
+  	<lightning-messages></lightning-messages>
+  
+    <lightning-input-field field-name={fields.name}></lightning-input-field>
+    <lightning-input-field field-name={fields.title}></lightning-input-field>
+
+    <lightning-button class="slds-m-around_xx-small" label="Cancel"></lightning-button>
+    <lightning-button class="slds-m-around_xx-small" variant="brand" type="submit" label="Save"></lightning-button>
+
+</lightning-record-edit-form>
+```
+
+
+
+#### Reset Buttons
+
+Para limpar o conteúdo dos botões podemos utilizar novamente do `this.template.querySelector` e iterando para cada `lightning-input-field`
+
+```html
+<lightning-record-edit-form    object-api-name={objectName}    onsuccess={handleSuccess}>
+
+  	<lightning-messages></lightning-messages>
+  
+    <lightning-input-field field-name={fields.name}></lightning-input-field>
+    <lightning-input-field field-name={fields.title}></lightning-input-field>
+
+  	<!-- apply the logic to reset the button  -->
+    <lightning-button onclick={resetButton} class="slds-m-around_xx-small" label="Cancel"></lightning-button>
+  
+  
+    <lightning-button class="slds-m-around_xx-small" variant="brand" type="submit" label="Save"></lightning-button>
+
+</lightning-record-edit-form>
+```
+
+Resetando:
+
+```js
+export default TestLDS extends LightningElement {
+	// ....
+  
+  resetButton() {
+    const inputFields = this.template.querySelector('lightning-input-field');
+    if (!inputFields)
+      return;
+
+    const inputFieldsArr = Array.from(inputFields);
+    inputFieldArr.forEach(field => {
+      field.reset();
+    })
+  }
+}
+```
+
+
+
+#### Hidden Label
+
+Por padrão quando usamos o `lightning-input-field` o `field-name` irá pegar a Label do próprio campo, ou seja, se a label for **email**, no input irá aparecer email, mas se quisermos algo como **digite seu email**, precisaremos utilizar o `variant=label-hidden`
+
+```html
+<label class="slds-p-left_x-small">Digite seu Email</label>
+<lightning-input-field variant="label-hidden" field-name={fields.email}></lightning-input-field>
+```
+
+
+
+
+
+### @Wire
+
+
+
+
+
+
+
+### Apex
+
+Os services criados com Apex (files  `.cls`) precisam ser `public/static/global` e devem estar anotados com `@AutraEnabled` para que o LWC consiga chama-los.
+
+Exemplo:
+
+```java
+public with sharing class AccountController {
+	
+  @AuraEnabled(cacheable=true)
+	public static List<Account> getAccountList() {
+		return [SELECT Id, Name, Type, Industry from Account];
+	}
+}
+```
+
+
+
+
+
+#### @AuraEnabled
+
+Permite que os métodos criados no Apex possam ser chamados pelo LWC
+```java
+// CountryService.cls
+
+public with sharing class CountryService
+{
+
+  @AuraEnabled
+  public static List<Country__c> queryAllCountries()
+  {
+      return Query.records([
+          SELECT Id, Name from Country__c where ISO_2__c != :null
+      ]);
+  }
+}
+```
+
+No LWC:
+
+```js
+// UserCountryModal.js
+
+import queryAllCountries from "@salesforce/apex/WorkPrioritizationUserServices.queryAllCountries";
+
+export default class UserCountryModal extends LightningModal {
+
+    async connectedCallback() { // when the component is rendenred in DOM
+        this.loadProfilePreferences();
+    }
+
+    async loadProfilePreferences() {
+        this.isLoading = true;
+        try {
+            await Promise.all([
+                this.loadCountriesPreferences()
+            ]);
+        } catch (error) {
+            handleError("Error loading profile preferences", error);
+        } finally {
+            this.isLoading = false;
+        }
+    }
+  
+    loadCountriesPreferences() {
+        return queryAllCountries()
+            .then(countries => {
+                const selected = this.getUserSelectedCountries();
+                const options = this.mapRecordsToOptions(countries);
+                this.setCountryOptions(options);
+                this.setInitialSelectedCountries(selected);
+            });
+    }
+```
