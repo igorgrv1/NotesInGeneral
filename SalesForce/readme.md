@@ -110,6 +110,12 @@ sf project deploy start \
   --source-dir force-app/main/default/classes/WorkPrioritizationViewServices.cls \
   --source-dir force-app/main/default/classes/WorkPrioritizationViewServices.cls-meta.xml \
   --source-dir force-app/main/default/lwc/wpUserProfileModal
+  
+  
+sf project deploy start \
+  --source-dir force-app/main/default/lwc/wpApp \
+  --source-dir force-app/main/default/lwc/wpViewBody \
+  --source-dir force-app/main/default/lwc/wpViewPage
 ```
 
 
@@ -142,8 +148,18 @@ sf org open -p lightning/n/Hello
 
 Run Apex Test
 
-```
-sf apex test run -c -r human -w 20
+```bash
+sf apex test run -c -r human -w 20 // EXECUTES ALL TESTS FROM ALL CLASSES
+
+sfdx force:apex:test:run --tests WorkPrioritizationUserServicesTest -c -r human --wait 10
+
+sfdx force:apex:test:run --tests WorkPrioritizationUserServicesTest.testQueryAllCountries -c -r human --wait 10
+
+sf apex run test --tests WorkPrioritizationUserServicesTest --code-coverage --detailed-coverage --result-format human
+
+sf apex run test --tests WorkPrioritizationUserServicesTest.testQueryAllCountries --code-coverage --result-format human
+
+sf apex run test --tests WorkPrioritizationUserServicesTest.testQueryAllCountries WorkPrioritizationUserServicesTest.testQueryAgentAvailableAccounts --code-coverage --result-format human
 ```
 
 
@@ -154,6 +170,40 @@ sf apex test run -c -r human -w 20
 * **Scratch Org**: funciona como um repositório, onde cada dev pode ter a sua. Após o dev terminar, ele pode subir o código para o sandbox (cópia de production)
 
 
+
+## Code Changes to Review before PR
+
+
+
+![Screenshot 2026-02-18 at 14.28.59](./imageResource/pr1.png)
+
+We should not have comments
+
+![Screenshot 2026-02-18 at 14.30.20](./imageResource/pr2.png)
+
+"Boolean parameter is a bad practice"
+
+Private methods should not be used
+
+<img src="/Users/igorromero/NotesInGeneral/SalesForce/imageResource/pr3.png" alt="Screenshot 2026-02-20 at 12.56.49" style="zoom: 35%;" />
+
+FROM /WHERE/SELECT should be capitalized / break down in multiple lines when many fields are selected
+
+<img src="./imageResource/pr4.png" alt="Screenshot 2026-02-25 at 23.31.45" style="zoom:50%;" />
+
+It's not necessary to SELECT `ID` - it comes for free/by default
+
+Tests with insert/delete MUST use the `isInstanceOfType` - example:
+
+<img src="./imageResource/pr6.png" alt="Screenshot 2026-02-26 at 00.10.36" style="zoom:50%;" />
+
+LWC we must use double quotes
+
+not need to check against 'null'
+
+<img src="./imageResource/pr7.png" alt="Screenshot 2026-02-26 at 00.18.40" style="zoom:50%;" />
+
+no need to use `event?.target?` only `event.target.value??` should be enough
 
 # LWC
 
@@ -417,6 +467,10 @@ export default class Test extends LightningElement {
 * `get` -> exige que o método **retorne algo**
 
 <img src="./imageResource/get.png" alt="Screenshot 2026-01-19 at 23.57.39" style="zoom:50%;" />
+
+
+
+
 
 
 
@@ -1192,7 +1246,7 @@ Existem alguns modos:
 
 ## Parent to Child
 
-É possível se comunicar através de:
+É possível se comunicar:
 
 * Passando dados primitivos/non-primitivos para o child
 * Passando dados por uma **action do Parent**
@@ -1331,7 +1385,7 @@ export default class ChildComponent extends LightningElement {
   	percentage-child={parentPercentage}  
   </c-child-component>
 </template>
-
+u
 
 
 <!-- ProgressBar.html -->
@@ -1385,7 +1439,599 @@ export default class Parent extends LightningElement {
 }
 ```
 
+* **PORÉM**, se o componente o Parent precisa se comunicar com grandchilds **é necessário usar o Bubble!**
 
+
+
+👉 **Dados descem via @api**
+ 👉 **Eventos sobem via CustomEvent**
+
+Nunca tente acessar property do bisneto direto tipo:
+
+```
+this.template.querySelector('c-wp-view-page')
+    .template.querySelector('c-wp-view-body')
+    .template.querySelector('c-wp-view-table-header')
+```
+
+Isso é anti-pattern e quebra encapsulamento!
+
+
+
+
+
+### Set/Setter
+
+Quando queremos modificar um dado que vêm do Parent em um component Child, podemos fazer o uso do `set`
+
+* `set` sempre precisa ser acompanhado de um `@api get`
+* `set` e `get` precisam ter o mesmo nome
+* `set` não pode modificar diretamente o dado, é preciso fazer um `shadown DOM` do elemento antes de modifica-lo
+
+
+
+Vamos imaginar que queremos manipular o valor do Parent no Child
+
+Exemplo:
+
+* Altere a idade do usuário através do Child
+
+```js
+export default class Parent extends LightningElement {
+  userDetails: {
+    name: 'Igor',
+    age: 29
+  }
+}
+
+
+export default class Child extends LightningElement {
+  
+  userFromChild = {}
+  
+  @api
+  get userFromParent() {
+		return this.userFromChild
+  }
+  
+  set userFromParent(data) {
+    const newAge = data.age * 2
+    this.userFromChild = {...data, age: newAge} // shadown copy
+  }
+}
+```
+
+No HTML iremos passar o q está no `get`  como uma `prop` dentro do Child element
+
+```html
+<!-- PARENT -->
+<template>
+  <c-child user-from-parent={userDetails}></c-child>
+</template>
+```
+
+
+
+## Between Siblings
+
+E se componentes 'irmãos' precisem conversar entre eles?
+
+* `wpTableHeader` possui property `selectedTabIndex` (que é o index da tab)
+* `wpTableBody` precisa alterar o conteúdo baseado nesse `id`
+* `wpView` importa os dois componentes (parent)
+
+![image-20260223234217564](./imageResource/siblings.png)
+
+
+
+```html
+<!-- wpView -->
+<template>
+    <c-wp-view-table-header
+        refresh-token={refreshToken}
+        onviewchange={handleViewChange}>
+    </c-wp-view-table-header>
+    <c-wp-view-table-body
+        lwc:if={selectedViewId}
+        selected-view-id={selectedViewId}
+        refresh-token={refreshToken}>
+    </c-wp-view-table-body>
+</template>
+
+<!-- wpTableHeader -->
+<lightning-tabset active-tab-value={activeTabId}>
+    <template for:each={viewDefinitions} for:item="view">
+        <lightning-tab
+            label={view.Title__c}
+            value={view.Id}
+            key={view.Id}
+            onactive={handleTabChange}>
+        </lightning-tab>
+    </template>
+</lightning-tabset>
+
+<!-- wpTableBody -->
+<lightning-datatable
+    lwc:if={hasRecords}
+    key-field="Id"
+    columns={columns}
+    data={rows}>
+</lightning-datatable>
+```
+
+
+
+Quando houver uma change no `selectedViewId` feita no `wpHeader` o `wpBody` precisa **escutar** e performar uma ação
+
+* Com o uso de `@get/set` isso é possível!
+
+```js
+// wpView - irá escutar as changes disparadas pelo Header -onviewchange={handleViewChange}
+//					e irá modificar o selectedViewId q irá ser escutado pelo Body
+handleViewChange(event) {
+    this.selectedViewId = event.detail.viewId;
+    this._refreshToken = event.detail.refreshToken;
+}
+
+// wpHeader - disparada o evento com o valor da viewId
+handleTabChange(event) {
+    this.activeTabId = event.target.value;
+    this.dispatchViewChange(this.activeTabId);
+}
+
+dispatchViewChange(viewId) {
+    if (!viewId) return;
+    this.dispatchEvent(new CustomEvent('viewchange', {
+        detail: { viewId, refreshToken: this._refreshToken },
+        bubbles: true,
+        composed: true
+    }));
+}
+
+// wpBody - irá receber via getter/setter os valores da viewId - quando viewId for setada, API é executada
+@api
+get selectedViewId() {
+    return this._selectedViewId;
+}
+
+set selectedViewId(id) {
+    this._selectedViewId = id;
+    this._getView(id);
+}
+```
+
+
+
+
+
+
+
+## Child to Parent
+
+### new CustomEvent()
+
+
+
+Se quisermos chamar uma ação do Parent a partir de um Child, podemos fazer uso do `CustomEvent()` 
+
+* O valor que colocarmos no `CustomEvent` irá refletir no parent com a palavra `on` no início
+
+```js
+const event = new CustomEvent("close") // no Parent será "onclose"
+this.dispatchEvent(event)
+```
+
+
+
+Exemplo:
+
+* Child -> Modal
+* Parent importa o Modal, porém a ação de abrir e fechar via no Parent, ou seja, o click de submit do Modal deverá chamar uma ação do Parent para fechar o Modal
+
+
+
+```html
+<!-- Parent.html -->
+<template>
+
+  <lightning-button label="Open Modal" onclick={openModalHandler}></lightning-input>
+
+  <!-- O evento do Child irá ser usado com 'on' aqui -->
+	<c-child-modal>
+  	onclose={closeModalParentHandler}  
+  </c-child-modal>
+</template>
+
+
+
+<!-- ChildModal.html -->
+<template>
+	... Modal HTML attributes
+  <lightning-button label="Close Modal" onclick={childClickHandler}></lightning-input>
+</template>
+```
+
+
+
+```js
+// Child.js -> Aqui irá o new CustomEvent 
+export default class ChildComponent extends LightningElement {
+
+  childClickHandler() {
+    const event = new CustomEvent("close")
+		this.dispatchEvent(event)
+  }
+}
+
+
+// Parent.js
+import { LightningElement, api } from "lwc";
+
+export default class Parent extends LightningElement {
+	showModal = false;
+  
+  openModalHandler() {
+    this.showModal = true
+  }
+  
+  closeModalParentHandler() {
+    this.showModal = false
+  }
+}
+
+```
+
+
+
+
+
+#### Bubble
+
+**Quando usar bubbles + composed?**
+
+Sempre que:
+
+- O evento precisa subir múltiplos níveis
+- Você quer capturar no root
+- Está atravessando componentes customizados
+
+
+
+Imagine que você precisa acessar uma property de um componente BISNETO, ou seja, ter q navegar entre vários outros componentes só para acessar um valor pode dar muito trabalho via `property binding`, e para isso existe o meio **Bubble** 
+
+Exemplo:
+
+* Quero disabilitar um botão q está no parent, baseado em uma action do child
+
+```html
+<!-- PARENT -->
+<lightning-layout-item padding="around-small" size="3" class="slds-text-align_right">
+    <lightning-button-group>
+            <lightning-button-icon
+                icon-name="utility:loop"
+               	onclick={reloadCurrentView}
+                title="Reload Current View"
+                disabled={isViewLoading}> <!-- AQUI IREMOS VERIFICAR LOADING -->
+             </lightning-button-icon>
+    </lightning-button-group>
+</lightning-layout-item>
+
+<template >
+    <c-wp-view-page 
+              refresh-token={refreshToken}
+            	onloadingchange={handleLoadingChange}> <!-- AQUI RECEBER VIA BOOBLE: onloadingchange-->
+  </c-wp-view-page>
+</template>
+
+
+
+
+<!-- CHILD - WPVIEWPAGE (recebe onloadingchange mas não exibe) -->
+<template>
+    <c-wp-view-body refresh-token={refreshToken}></c-wp-view-body>
+</template>
+
+
+<!-- GRANDCHILD - WPVIEWPAGEBODY (recebe onloadingchange mas não exibe) -->
+<template>
+    <c-wp-view-table-body
+        lwc:if={selectedViewId}
+        selected-view-id={selectedViewId}
+        refresh-token={bodyRefreshToken}>
+    </c-wp-view-table-body>
+</template>
+
+
+<!-- GRANDGRANDCHILD - WPVIEWTABLEBODY (EXPÕE O BUBBLE)! -->
+<template>
+    <c-wp-view-table-body
+        lwc:if={selectedViewId}
+        selected-view-id={selectedViewId}
+        refresh-token={bodyRefreshToken}>
+    </c-wp-view-table-body>
+</template>
+```
+
+
+
+```js
+// grandgrandchild - wpViewTableBody é oq irá emitir o bubble
+export default class WpViewTableBody extends LightningElement {
+  isLoading = true;
+
+  // onde emitimos o evento com bubble!
+  _setLoading(value) {
+      this.isLoading = value;
+      this.dispatchEvent(new CustomEvent('loadingchange', { // será lido como onloadingchange
+          detail: { isLoading: value },
+          bubbles: true,
+          composed: true
+      }));
+  }
+  
+  // outras funções
+  
+  // onde o setLoading é feito
+  async _getView(viewId) {
+      try {
+          this._setLoading(true);
+          const records = await getView({ viewId });
+          const { rows, keySet } = this._getTableRows(records);
+          this.columns = this._getTableColumns(keySet);
+          this.rows = rows;
+      } catch (error) {
+          handleError("Error getting view records", error);
+      } finally {
+          this._setLoading(false);
+      }
+  }
+
+}
+```
+
+
+
+
+
+### Event with Data
+
+É possível passar dados também ao `CustomEvent` 
+
+
+
+```js
+// Child.js
+export default class ChildComponent extends LightningElement {
+
+  childClickHandler() {
+    const event = new CustomEvent("close", {
+      detail: "Modal Closed Successfully"
+    })
+		this.dispatchEvent(event)
+  }
+}
+
+
+// Parent.js
+import { LightningElement, api } from "lwc";
+
+export default class Parent extends LightningElement {
+	showModal = false;
+  detailFromChild = "";
+  
+  openModalHandler() {
+    this.showModal = true
+  }
+  
+  closeModalParentHandler(event) {
+    this.detailFromChild = event.detail // AQUI, acessamos o valor passado pelo Child
+    this.showModal = false
+  }
+}
+```
+
+
+
+
+
+## Slots
+
+LWC também nós dá a habilidade de inserir **elemento HTML dentro de outro component**, com o uso de **`<slot />`** 
+
+* Unnamed Slots
+* Named Slots
+
+
+
+Quando o componente possuí somente **1 único slot**, é possível usar o **_unnamed slot_**, PORÉM, se possuir +1 é necessário dar um `name`, caso contrário o conteúdo será duplicado!
+
+```html
+<!-- PARENT -->
+<template>
+	<c-child-component>
+  	<p> unnamed slot test </p> <!-- ENVIANDO UM CONTEÚDO HTML -->
+  </c-child-component>
+</template>
+
+
+
+<!-- CHILD -->
+<template>
+		<h1>Child Component</h1>
+  
+	  <!-- O que o Parent enviar, aparecerá aqui -->
+  	<slot></slot>
+</template>
+```
+
+
+
+Named Slot
+
+```html
+<!-- PARENT -->
+<template>
+	<c-child-component>
+  	<p slot="first"> First Slot </p>
+  	<p slot="second"> Second Slot </p>    
+  </c-child-component>
+</template>
+
+
+
+<!-- CHILD -->
+<template>
+		<h1>Child Component</h1>
+  	<slot name="first"></slot>
+  	
+  	<h2>Second Slot</h2>
+    <slot name="second"></slot>
+</template>
+```
+
+
+
+
+
+
+
+
+
+# Others
+
+## Static Resources
+
+E se quisermos incluir uma imagem dentro do SF?
+
+* Vá até "Setup"
+* Quick find: Static Resources
+* New -> Coloque um `name` que deve ser único (e será usado no LWC)
+
+<img src="./imageResource/staticResource.png" alt="Screenshot 2026-02-16 at 11.50.57" style="zoom:80%;" />
+
+
+
+No LWC:
+
+```js
+// imagens vão como UpperCase
+// o name dado no resource irá no final
+import USER_IMAGE from '@salesforce/resourceUrl/user_image'
+
+export default class TestStaticResource extends LightningElement {
+  userImage = USER_IMAGE
+}
+```
+
+```html
+<template>
+	<lightning-card title="Static Image Demo">
+  	<img src={userImage} height="100px" />
+  </lightning-card>
+</template>
+```
+
+
+
+## 3rd JS lib / loadScript
+
+E se quisermos usar libs como o `moment, datepicker, carbon design`?  De forma similar com o que é feito no `resourceUrl` para importar ***static images*** , podemos também importar libraries!
+
+* Vá até "Setup"
+* Quick find: Static Resources
+* New -> Coloque um `name` que deve ser único (e será usado no LWC)
+* Adicione o file `.zip` 
+
+
+
+No LWC/JS, iremos utilizar o `loadScript` para fazer a leitura do file
+
+* A leitura do file deve acontecer no ` renderedCallback` (só queremos que o script execute uma ação quando tudo for terminado)
+* Não queremos que o script fique sendo executado a todo momento, então criamos uma variável de controle (`isLoaded`)
+* `Promise` deve ser usado pq o carregamento do file é async
+
+```js
+import { loadScript } from 'lightning/platformResourceLoader';
+import flatpick from '@salesforce/resourceUrl/flatpick'
+import moment from '@salesforce/resourceUrl/moment' 
+
+export default class TestStaticResource extends LightningElement {
+
+  isLibLoaded = false
+  currentDate = ''
+  
+  renderedCallback () {
+    if (this.isLibLoaded)
+      return
+
+    Promise.all([
+        loadScript(this, flatpick + '/4.6.6/flatpickr.js'),
+        loadScript(this, flatpick + '/4.6.6/flatpickr.js'),
+      ])
+        .then(() => {
+          this.intializeDatepicker(); // iremos chamar as funções quando elas forem executadas
+      		this.setCurrentDate();
+        })
+        .catch((error) => {
+          console.log({ message: 'Error onloading', error });
+        });
+    
+    this.isLibLoaded = true
+  }
+  
+  setCurrentDate() {
+    this.currentDate = moment().format('LLLL');
+  }
+  
+  intializeDatepicker() {
+    const calendarInput = this.template.querySelector(
+      '.bx--date-picker__input'
+    );
+    this.flatpickrElement = window.flatpickr(calendarInput, {
+      dateFormat: 'm/d/Y',
+      nextArrow: `<svg width="16px" height="16px" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+        <path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z"/>
+      </svg>`,
+      prevArrow: `<svg width="16px" height="16px" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+        <path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z"/>
+      </svg>`
+    });
+    this.dispatchEvent(new CustomEvent('load'));
+  }
+}
+```
+
+
+
+## 3rd CSS lib / loadStyle
+
+Da mesma forma que importamos os outros static resources, faremos para o CSS
+
+* Vá até "Setup"
+* Quick find: Static Resources
+* New -> Coloque um `name` que deve ser único (e será usado no LWC)
+* Adicione o file `.zip` 
+
+
+
+```js
+import { loadstyle } from 'lightning/platformResourceLoader';
+import ANIMATE from '@salesforce/resourceUrl/flatpick'
+
+export default class TestStaticResource extends LightningElement {
+  isLibLoaded = false
+  
+  renderedCallback () {
+    if (this.isLibLoaded)
+      return
+
+    Promise.all([
+      loadstyle(this, ANIMATE + 'animate/animate.min.css')
+    ])
+    
+    this.isLibLoaded = true
+}
+```
 
 
 
@@ -1876,3 +2522,10 @@ export default class UserCountryModal extends LightningModal {
             });
     }
 ```
+
+
+
+
+
+# Metadata Types
+
