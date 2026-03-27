@@ -115,7 +115,9 @@ sf project deploy start \
 sf project deploy start \
   --source-dir force-app/main/default/lwc/wpApp \
   --source-dir force-app/main/default/lwc/wpViewBody \
-  --source-dir force-app/main/default/lwc/wpViewPage
+  --source-dir force-app/main/default/lwc/wpViewPage \
+  --source-dir force-app/main/default/lwc/wpViewTableBody \
+  --source-dir force-app/main/default/lwc/wpViewTableHeader
 ```
 
 
@@ -179,6 +181,8 @@ sf apex run test --tests WorkPrioritizationUserServicesTest.testQueryAllCountrie
 
 We should not have comments
 
+* If you're going to add comments, try encapsulating the methods in a way that the comment is not needed
+
 ![Screenshot 2026-02-18 at 14.30.20](./imageResource/pr2.png)
 
 "Boolean parameter is a bad practice"
@@ -204,6 +208,8 @@ not need to check against 'null'
 <img src="./imageResource/pr7.png" alt="Screenshot 2026-02-26 at 00.18.40" style="zoom:50%;" />
 
 no need to use `event?.target?` only `event.target.value??` should be enough
+
+Update all the apiversion of the files that were changed
 
 # LWC
 
