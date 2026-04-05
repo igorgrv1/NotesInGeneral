@@ -203,7 +203,14 @@ Tests with insert/delete MUST use the `isInstanceOfType` - example:
 
 LWC we must use double quotes
 
-not need to check against 'null'
+Null safe operator with evaluate to truthy/falsy in the ternary, so no need to check agains null
+
+```js
+// wrong -> Account?.CMR_Number__c == null ? '' :  Account.CMR_Number__c
+// correct -> Account?.CMR_Number__c ? "":  Account.CMR_Number__c
+```
+
+
 
 <img src="./imageResource/pr7.png" alt="Screenshot 2026-02-26 at 00.18.40" style="zoom:50%;" />
 
@@ -211,9 +218,19 @@ no need to use `event?.target?` only `event.target.value??` should be enough
 
 Update all the apiversion of the files that were changed
 
-# LWC
+Avoid abbreviations
 
-LWC = Lightning Web Component
+<img src="./imageResource/abrr.png" alt="Screenshot 2026-03-30 at 16.27.49" style="zoom:50%;" />
+
+```javascript
+// check if the list has also values
+// if (datasourceList != null)
+if (datasourceList != null && !datasourceList.isEmpty())
+```
+
+
+
+# LWC = Lightning Web Component
 
 Library: https://developer.salesforce.com/docs/component-library/overview/components
 
