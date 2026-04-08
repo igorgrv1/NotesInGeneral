@@ -771,214 +771,239 @@ correct: D
 
 id: 64
 theme: Navigation
-question: XX
+question: What's a key benefit (or benefits) of Lightning apps for your users?
 options:
-  A: XX
-  B: XX
-  C: XX
-  D: XX
-  E: XX
-correct: XX
+  A: Users can create records and access recent records and lists directly from the navigation bar.
+  B: It's easy to switch contexts with the App Launcher.
+  C: Lightning apps give users access to the items, objects, and pages they need most.
+  D: All of the above
+correct: D
 
 ---
 
 id: 65
 theme: Navigation
-question: XX
+question: What can you include in a Lightning app?
 options:
-  A: XX
-  B: XX
-  C: XX
-  D: XX
-  E: XX
-correct: XX
+  A: Unique scents that get released when a user clicks a button
+  B: Custom sound effects and flashing text
+  C: Web tabs, standard and custom objects, and utility features like Lightning Voice
+  D: All of the above
+correct: C
 
 ---
 
 id: 66
 theme: Navigation
-question: XX
+question: What's a good way to optimize an app for your users?
 options:
-  A: XX
-  B: XX
-  C: XX
-  D: XX
-  E: XX
-correct: XX
+  A: Brand the app with an animated GIF and neon colors to get their attention.
+  B: Put the highest priority objects and tabs first in the navigation menu.
+  C: Have a developer code in a sad trombone sound effect that plays for every error message.
+  D: Add every object in the org to the navigation menu.
+correct: B
 
 ---
 
 id: 67
 theme: Navigation
-question: XX
+question: How do custom actions help your users?
 options:
-  A: XX
-  B: XX
-  C: XX
-  D: XX
-  E: XX
-correct: XX
+  A: By allowing them to create custom objects
+  B: By giving them more ways to view and edit records
+  C: By making it fast and easy to interact with information in your org
+  D: A and B
+  E: B and C
+correct: E
 
 ---
 
 id: 68
 theme: Navigation
-question: XX
+question: What’s the main difference between object-specific actions and global actions?
 options:
-  A: XX
-  B: XX
-  C: XX
-  D: XX
-  E: XX
-correct: XX
+  A: Object-specific actions have automatic relationships to other records, and global actions don't.
+  B: Global actions perform actions outside of Salesforce, and object-specific actions only perform actions inside Salesforce.
+  C: Object-specific actions perform actions only on specific objects.
+  D: You can use object-specific actions wherever actions are supported in Salesforce.
+correct: A
 
 ---
 
 id: 69
 theme: Navigation
-question: XX
+question: What is AgentExchange?
 options:
-  A: XX
-  B: XX
-  C: XX
-  D: XX
-  E: XX
-correct: XX
+  A: A vibrant community powered by admins, developers, and Salesforce partners
+  B: The unofficial Salesforce store for solutions and services
+  C: A place to connect with prebuilt solutions for business challenges you face
+  D: A and B
+  E: A and C
+correct: E
 
 ---
 
 id: 70
 theme: Navigation
-question: XX
+question: What is important to keep in mind when you develop an AgentExchange strategy?
 options:
-  A: XX
-  B: XX
-  C: XX
-  D: XX
-  E: XX
-correct: XX
+  A: Think about whether you want a free or paid solution.
+  B: Have an environment where you can test the solution, like a Developer Edition org or a sandbox.
+  C: Avoid meeting with stakeholders, because they might slow down your search for a solution.
+  D: A and B
+  E: A and C
+correct: D
 
 ---
 
 id: 71
 theme: Navigation
-question: XX
+question: What is one benefit of logging in to AgentExchange?
 options:
-  A: XX
-  B: XX
-  C: XX
-  D: XX
-  E: XX
-correct: XX
+  A: You can access filters.
+  B: You save time when you install a solution.
+  C: You gain access to private developer forums.
+  D: You can directly edit Salesforce code.
+correct: B
 
 ---
 
 id: 72
 theme: Navigation
-question: XX
+question: What area of AgentExchange lets you discover solutions according to your business challenge or industry?
 options:
-  A: XX
-  B: XX
-  C: XX
-  D: XX
-  E: XX
-correct: XX
+  A: Collections
+  B: Explore
+  C: Learn
+  D: Consultants
+correct: B
 
 ---
 
 id: 73
 theme: Navigation
-question: XX
+question: How does a test drive differ from a Trialforce trial?
 options:
-  A: XX
-  B: XX
-  C: XX
-  D: XX
-  E: XX
-correct: XX
+  A: A test drive uses a read-only org, while a Trialforce  trial uses a writeable org.
+  B: Test drives include sample data, but  Trialforce trials don’t.
+  C: A test drive is available on every listing, but a Trialforce trial may not be.
+  D: To start a test drive, you contact the provider, but to start a Trialforce trial, you click Get It Now on the listing.
+correct: A
 
 ---
 
 id: 74
 theme: Navigation
-question: XX
+question: How can you learn more about a solution when you have questions?
 options:
-  A: XX
-  B: XX
-  C: XX
-  D: XX
-  E: XX
-correct: XX
+  A: Read reviews from community members.
+  B: Search on the internet.
+  C: Read documentation from the provider on the More Details tab.
+  D: B and C
+  E: A and C
+correct: E
 
 ---
 
 id: 75
 theme: Navigation
-question: XX
+question: As you find more solutions for your production and sandbox orgs, how can you manage all of them?
 options:
-  A: XX
-  B: XX
-  C: XX
-  D: XX
-  E: XX
-correct: XX
+  A: Ask your Salesforce admin to manage everything for you.
+  B: Go to the My Installs & Subscriptions page.
+  C: Browse AgentExchange collections.
+  D: Click the Reviews tab.
+correct: B
 
 ---
 
 id: 76
 theme: Navigation
-question: XX
+question: There are many ways to engage with AgentExchange. What are ways you can connect with AgentExchange?
 options:
-  A: XX
-  B: XX
-  C: XX
-  D: XX
-  E: XX
-correct: XX
+  A: Sign up for the AgentExchange newsletter.
+  B: Search for us in the phone book after AAA Towing.
+  C: Find us on LinkedIn and X.
+  D: A and B
+  E: A and C
+correct: E
 
 ---
 
 id: 77
-theme: Navigation
-question: XX
+theme: Data Model
+question: What must you do before adding new currencies to your company settings?
 options:
-  A: XX
-  B: XX
-  C: XX
-  D: XX
-  E: XX
-correct: XX
+  A: Set the corporate currency.
+  B: Activate the multicurrency option for your org.
+  C: Add the Currency dropdown field to the Opportunities object.
+  D: Purchase multicurrency licenses for all platform users.
+correct: B
 
 ---
 
 id: 78
-theme: Navigation
-question: XX
+theme: Data Model
+question: Enabling Advanced Currency Management enables your org to do what?
 options:
-  A: XX
-  B: XX
-  C: XX
-  D: XX
-  E: XX
-correct: XX
+  A: Choose more than one currency for a single account.
+  B: Add currencies to personal profiles
+  C: Manage dated exchange rates.
+  D: Have all currency conversions use the static exchange rates.
+correct: C
 
 ---
 
 id: 79
-theme: Navigation
-question: XX
+theme: Data Model
+question: Which of these features can you use to control access at the object level?
 options:
-  A: XX
-  B: XX
-  C: XX
-  D: XX
-  E: XX
-correct: XX
+  A: Authorized User Lists
+  B: Sharing Rules
+  C: Permission Sets
+  D: Object Rules
+correct: C
 
 ---
 
 id: 80
-theme: Navigation
+theme: Data Model
+question: Which of these is a method for controlling record-level access?
+options:
+  A: Organization-Wide Defaults
+  B: Permission Set Groups
+  C: Profiles
+  D: Event Monitoring
+correct: A
+
+---
+
+id: 81
+theme: Data Model
+question: Why does Maria add the validation status field to the compact layout?
+options:
+  A: To display it at the top of each article
+  B: To activate it for Ursa Major
+  C: To change the validation status
+  D: To control the field-level visibility
+correct: XX
+
+---
+
+id: 82
+theme: Data Model
+question: How do you create a validation status?
+options:
+  A: By viewing the status
+  B: By editing the article
+  C: By adding an item to the Validation Status picklist
+  D: By creating a validation rule
+correct: XX
+
+---
+
+id: 83
+theme: Data Model
 question: XX
 options:
   A: XX
@@ -990,47 +1015,8 @@ correct: XX
 
 ---
 
-id: XX
-theme: Navigation
-question: XX
-options:
-  A: XX
-  B: XX
-  C: XX
-  D: XX
-  E: XX
-correct: XX
-
----
-
-id: XX
-theme: Navigation
-question: XX
-options:
-  A: XX
-  B: XX
-  C: XX
-  D: XX
-  E: XX
-correct: XX
-
----
-
-id: XX
-theme: Navigation
-question: XX
-options:
-  A: XX
-  B: XX
-  C: XX
-  D: XX
-  E: XX
-correct: XX
-
----
-
-id: XX
-theme: Navigation
+id: 84
+theme: Data Model
 question: XX
 options:
   A: XX

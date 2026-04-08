@@ -1,9 +1,6 @@
 # Salesforce certifications
 
-
-
 ## Certifications
-
 
 
 * [Salesforce Certified Platform Foundations](https://trailheadacademy.salesforce.com/certificate/exam-platform-foundations---Plat-101)

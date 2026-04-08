@@ -179,19 +179,19 @@ sf apex run test --tests WorkPrioritizationUserServicesTest.testQueryAllCountrie
 
 ![Screenshot 2026-02-18 at 14.28.59](./imageResource/pr1.png)
 
-We should not have comments
+We should not have comments;
 
 * If you're going to add comments, try encapsulating the methods in a way that the comment is not needed
 
 ![Screenshot 2026-02-18 at 14.30.20](./imageResource/pr2.png)
 
-"Boolean parameter is a bad practice"
+Boolean as a parameter is a bad practice
 
 Private methods should not be used
 
 <img src="/Users/igorromero/NotesInGeneral/SalesForce/imageResource/pr3.png" alt="Screenshot 2026-02-20 at 12.56.49" style="zoom: 35%;" />
 
-FROM /WHERE/SELECT should be capitalized / break down in multiple lines when many fields are selected
+​	
 
 <img src="./imageResource/pr4.png" alt="Screenshot 2026-02-25 at 23.31.45" style="zoom:50%;" />
 
@@ -212,11 +212,15 @@ Null safe operator with evaluate to truthy/falsy in the ternary, so no need to c
 
 
 
+# Errors :error
+
+
+
 <img src="./imageResource/pr7.png" alt="Screenshot 2026-02-26 at 00.18.40" style="zoom:50%;" />
 
 no need to use `event?.target?` only `event.target.value??` should be enough
 
-Update all the apiversion of the files that were changed
+Update the `<apiVersion` of all the `*js-meta.xml` to the latest version -> `66.0`
 
 Avoid abbreviations
 
@@ -228,7 +232,7 @@ Avoid abbreviations
 if (datasourceList != null && !datasourceList.isEmpty())
 ```
 
-
+Do not use hardcoded URLs, use SF Custom labels instead.
 
 # LWC = Lightning Web Component
 
