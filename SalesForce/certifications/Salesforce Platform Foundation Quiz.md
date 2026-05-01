@@ -1004,24 +1004,176 @@ correct: XX
 
 id: 83
 theme: Data Model
-question: XX
+question: What two types of account-contact relationships can you see in Contacts to Multiple Accounts?
 options:
-  A: XX
-  B: XX
-  C: XX
-  D: XX
-  E: XX
-correct: XX
+  A: Positive and negative
+  B: Parent and sibling
+  C: Happy and unhappy
+  D: Direct and indirect
+  E: Complete and incomplete
+correct: D
 
----
+----
 
 id: 84
 theme: Data Model
-question: XX
+question: How do you set up the account hierarchy?
 options:
-  A: XX
-  B: XX
-  C: XX
-  D: XX
-  E: XX
-correct: XX
+  A: Ask an administrator to set it up for you.
+  B: Add a Parent Account to the account's record.
+  C: Record the parent account's name in a Note on the account.
+  D: Write it on a sticky note and put it on your desk.
+correct: B
+
+---
+
+id: 85
+theme: Data Model
+question: Who should be on your personal Default Account Team?
+options:
+  A: Coworkers from your department who want to know how you achieve all your success
+  B: All the contacts for all your accounts
+  C: Coworkers you usually work with on your accounts
+  D: Customers who responded positively to the last marketing campaign
+correct: C
+
+---
+
+id: 86
+theme: Data Model
+question: Which of the following can you expect from opportunity teams?
+options:
+  A: They form long-term relationships with customers
+  B: They share information, tips, or contacts that help close the deal
+  C: They split credit equally on opportunities
+  D: B and C
+correct: B
+
+---
+
+id: 87
+theme: Data Model
+question: What type of split do you use to credit a supporting team member who  wasn’t directly responsible for the revenue on an opportunity?
+options:
+  A: None
+  B: A revenue split
+  C: An overlay split
+  D: An opportunity product split
+correct: C
+
+---
+
+id: 88
+theme: Data Model
+question: Which of these actions isn’t a valid way to update the status of a lead?
+options:
+  A: In Path, click Mark Status as Complete.
+  B: Click the desired step on the Path, then click Mark Current Status. View the  Lead Record, click Edit, and change the Status field.
+  C: Change the Kanban settings Group By to status. Drag the record to a different column.
+  D: In any list view, click Shuffle to change up every record’s status.
+correct: D
+
+---
+
+id: 89
+theme: Data Model
+question: You have a dozen open opportunities from different companies. But when  you check the Kanban view of your All Open Opportunities list, you only  see opportunities for one account. What should you do?
+options:
+  A: Panic!
+  B: Select a different list view, such as Recently Viewed.
+  C: Check the filter panel to see if records are being filtered out.
+  D: Use the search box to search for the opportunities that went missing.
+  E: Try to attract more opportunities by leaving a bowl of candy on your desk overnight.
+correct: C
+
+---
+
+id: 90
+theme: Data Model
+question: True or false: You can create custom fields only on standard Salesforce objects.
+options:
+  A: True
+  B: False
+correct: B
+
+---
+
+id: 91
+theme: Data Model
+question: Why is it important to define a data type when you create a custom field?
+options:
+  A: Data types determine the dashboard view of your accounts.
+  B: You need to distinguish between different currencies.
+  C: The data type determines how the field is formatted, such as by menu items, text, numbers, or currency.
+  D: You can’t repeat data types in a record.
+correct: C
+
+---
+
+id: 92
+theme: Dashboard
+question: True or false: In its simplest form, a report is a group of data that meets a set of criteria, such as a list of accounts.
+options:
+  A: True
+  B: False
+correct: A
+
+---
+
+id: 93
+theme: Dashboard
+question: What does the running user of a dashboard do?
+options:
+  A: Runs the dashboard each morning
+  B: Determines the data shown in the dashboard
+  C: Enters data into Salesforce
+  D: Maintains backup copies of dashboard data
+correct: B
+
+---
+
+id: 94
+theme: Dashboard
+question: What is a dashboard?
+options:
+  A: A list of records that meet the criteria you define.
+  B: A visual display of key metrics and trends for records in your org.
+  C: A list of key tasks to be completed in your org.
+  D: A view of your computer's memory usage.
+correct: B
+
+---
+
+id: 95
+theme: Dashboard
+question: What does a report type determine?
+options:
+  A: Which fields and records are available for use when creating a report.
+  B: Who can access the report.
+  C: The date range used for the report.
+  D: The colors available in a dashboard.
+correct: A
+
+---
+
+id: 96
+theme: Dashboard
+question: What is the maximum number of blocks allowed in a joined report?
+options:
+  A: 2
+  B: 3
+  C: 5
+  D: 8
+correct: C
+
+---
+
+id: 97
+theme: Dashboard
+question: True or false: Blocks in a joined report must be based on related Salesforce objects.
+options:
+  A: True
+  B: False
+correct: A
+
+​                                                                                                                                                                                                                                              

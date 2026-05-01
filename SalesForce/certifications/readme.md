@@ -51,6 +51,8 @@ Use this document to simulate a real Salesforce Platform Foundations exam.
 Rules:
 - Ask the user which language they want the explanations in (the user must type the language, e.g., "English", "Portuguese", "Spanish", etc.)
 - As soon as the user answers the language, immediately start the exam (do NOT wait for any "start" command)
+- Do not repeat the questions
+- Shuffle the alternatives
 - Ask one question at a time
 - Randomize the questions
 - Do not reveal the correct answer until the user responds
@@ -297,3 +299,28 @@ Antigo Workflow Builder/Process Builder
 * Global Search
   * É onde podemos procurar por qualquer objeto/conteúdo dentro do salesforce
   * Suporta AND/OR/NOT clauses
+
+
+
+# Bullet points
+
+* ISV: Independent Software Vendor
+* What is the name of the program that helps eligible nonprofits get started with Salesforce and Agentforce Nonprofit?
+  * **Power of Us Program**
+* What is the process called that ensures every agent acts with accuracy and trust by grounding the model's response in metadata and semantics?
+  * **RAG**
+* What can you build with the Lightning App Builder?
+  * A: At-a-glance, dashboard-style apps
+     B: Custom Lightning pages
+* What are the three main categories in the Setup menu?
+  * C: Administration, Platform Tools, Settings
+* Where can you access the recycle bin in Lightning Experience?
+  * App Launcher
+* What wildcard is used to match only one character at the middle or end of your query when searching in the global search?
+  * ?
+* What type of split do you use to credit a supporting team member who wasn’t directly responsible for the revenue on an opportunity?
+  * Overlay split
+* Key features on the Home page include:
+  * Assistant, news, performance chart
+* Enabling Advanced Currency Management enables your org to do what?
+  * Manage dated exchange rates

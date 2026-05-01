@@ -7,7 +7,7 @@
 
 
 
-## Fundamentos de IA e LLMs para Programadores
+# Fundamentos de IA e LLMs para Programadores
 
 ### Machine Learning, Deep Learning e Artificial Intelligence
 
@@ -44,7 +44,7 @@ Kaggle (https://www.kaggle.com/) -> Possui base de dados gigantes que podem ser 
 
 * Por exemplo, existe uma base com várias raças de cachorro (várias fotos de raças diferentes), que permitem o modelo ser treinado para identificar outras imagens
 
-<img src="./imageResource/teachble.png" alt="Screenshot 2026-03-29 at 22.15.58" style="zoom:50%;" />
+<img src="../imageResource/teachble.png" alt="Screenshot 2026-03-29 at 22.15.58" style="zoom:50%;" />
 
 
 
@@ -78,8 +78,10 @@ Exemplo de um objeto
 Após transformar o objeto em Tensor, temos que transformar os dados no **range de 0 e 1**
 
 * **one-hot encoding:** Transf. os atributos em colunas, e associamos o número 1 ao o que dá "match"
+  * *Preferência de cor / cidade não existe range! então fica com 0 e 1 - não há 'meia cor preferida'*
 
-![Screenshot 2026-03-29 at 22.24.25](./imageResource/tensor.png)
+
+![Screenshot 2026-03-29 at 22.24.25](../imageResource/tensor.png)
 
 ```json
 // Primeira transformação teríamos (problema com a idade):
@@ -112,7 +114,82 @@ Rede neural irá funcionar baseado nessa estrutura:
   * Quanto mais exemplos, melhor o aprendizado!
 * **Output**: Resultado final dado o treinamento e input
 
-![Screenshot 2026-03-29 at 22.33.45](./imageResource/redeneural.png)
+![Screenshot 2026-03-29 at 22.33.45](../imageResource/redeneural.png)
+
+
+
+## Treinando Rede Neural
+
+Treinar uma rede neural nada mais é do que encher ela de exemplos de onde vc quer chegar!
+
+Se queremos Categorizar as pessoas, iremos treinar a rede neural fornecendo exemplos do **PORQUÊ aquela pessoa pertence ao grupo X**, e então **os neurônios (mini-calculadoras)** irão calcular a probabilidade de uma nova pessoa entregar na categoria!
+
+
+
+> "Quanto mais dados e mais diversidade, melhor!"
+
+```json
+const categorias = [ "premium","médium","básico"]
+const pessoas = {
+  pessoas: [
+    {
+      nome: "Erick",
+      idade: 30,
+      corPreferida: "azul",
+      cidade: "São Paulo",
+      categoria: "premium
+    },
+    {
+      nome: "Ana",
+      idade: 25,
+      corPreferida: "vermelho",
+      cidade: "Rio",
+      categoria: "médium",
+    },
+    {
+      nome: "Carlos",
+      idade: 40,
+      corPreferida: "verde",
+      cidade: "Curitiba",
+      categoria: "básic",
+    },
+  ]
+}
+```
+
+No exemplo acima a rede neural irá calcular a categoria baseada em:
+
+* Cor preferida
+* Cidade
+* Idade
+
+
+
+**@tensorflow/tfjs-node** - É a lib utilizada para treinarmos uma rede neural
+
+```javascript
+import tf from '@tensorflow/tfjs-node';
+
+const tensorPessoasNormalizado = [
+    [0.33, 1, 0, 0, 1, 0, 0], // Erick
+    [0, 0, 1, 0, 0, 1, 0],    // Ana
+    [1, 0, 0, 1, 0, 0, 1]     // Carlos
+]
+
+const labelsNomes = ["premium", "medium", "basic"]; // Ordem dos labels
+const tensorLabels = [
+    [1, 0, 0], // premium - Erick
+    [0, 1, 0], // medium - Ana
+    [0, 0, 1]  // basic - Carlos
+];
+
+// Criamos tensores de entrada (xs) e saída (ys) para treinar o modelo
+const inputXs = tf.tensor2d(tensorPessoasNormalizado)
+const outputYs = tf.tensor2d(tensorLabels)
+
+inputXs.print();
+outputYs.print();
+```
 
 
 
