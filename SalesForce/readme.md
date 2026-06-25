@@ -32,7 +32,7 @@ sfdx force:auth:web:login -a igorromero -d
 -r -> instance url
 
 sfdx force:auth:web:login -a CSPProd -r https://login.salesforce.com
-sfdx force:auth:web:login -a merlindev2 -r https://ibmsf--merlindev2.sandbox.my.salesforce.com
+sfdx force:auth:web:login -a merlindev1 -r https://ibmsf--merlindev1.sandbox.my.salesforce.com
 
 old way
 sfdx force:auth:web:login --alias igorromero --instance-url https://igorromero.my.salesforce.com
