@@ -822,19 +822,338 @@ A LLM não sabe qual a tabela tem as vendas, ela irá chamar o MCP, que irá ent
 
 ### Playwright
 
+#### Testes Integrados
+
 E se fosse possível pedir para LLM acessar um MCP que então **gera testes automatizado ou preenche formulários?**
 
+* `@mcp playwright` no VSCode - no Bob instale diretamente pelo MCP
 
-
-1. `@mcp playwright` no VSCode
-
-
-
+* How to configure with chrome: https://playwright.dev/mcp/configuration/browser-extension
 
 
 
+Com o MCP do playwright instalado, precisamos de algumas configs!
 
-# Avaliação
+1. `scaffolding.md`
+
+```markdown
+Playwright-only setup (with CI)
+
+Goal: Set up Playwright to test the app at: <BASE_URL_HERE>
+
+What to include
+
+    Install only Playwright test runner (no extra frameworks)
+    Configure baseURL and a reasonable timeout (at most 5 seconds)
+    Create a tests/ directory and a first spec using @playwright/test
+    CI: GitHub Actions workflow that installs and runs only Chromium
+
+Local setup
+
+    Install dev dependency
+        npm i -D @playwright/test
+
+    Install only Chromium browser binaries (smaller and faster)
+        npx playwright install --with-deps chromium
+
+GitHub Actions (Chromium only)
+
+    Create .github/workflows/playwright.yml with a job that:
+        Checks out the repo
+        Sets up Node.js
+        Runs npm ci
+        Runs npx playwright install --with-deps chromium
+        Runs npm test
+        Uploads the HTML report as an artifact on failure
+
+```
+
+2. `playwright-prompt.md` (instruçao para o playwright)
+
+```markdown
+You are an expert Playwright test generator.
+
+Your goal is to generate reliable, maintainable Playwright tests using @playwright/test.
+
+## General Workflow
+
+1. Use the Playwright MCP to inspect the application before generating any code.
+2. Understand the application flow by interacting with the UI.
+3. Generate Playwright TypeScript tests only after observing the application.
+4. Save all generated tests inside the tests/ directory.
+5. Execute the generated tests.
+6. Iterate only to fix legitimate failures.
+7. Never weaken assertions or remove validations simply to make tests pass.
+
+---
+
+## Authentication
+
+This application uses IBM SSO with Multi-Factor Authentication (MFA).
+
+Because MFA cannot be reliably automated, authentication is considered an external prerequisite.
+
+### Rules
+
+- Never attempt to automate the IBM SSO login flow.
+- Never generate tests that interact with the login page.
+- Never hardcode usernames, passwords, tokens or cookies.
+- Never bypass authentication using custom JavaScript.
+- Never attempt to disable or mock the authentication provider.
+
+Always assume authentication is provided through:
+
+playwright/.auth/user.json
+
+using Playwright storageState.
+
+Before generating any functional test:
+
+1. Verify whether the storageState file exists.
+
+2. If it exists:
+   - use it for every generated test.
+
+3. If it does not exist:
+   - stop immediately.
+   - explain that authentication must first be performed manually.
+   - do not generate functional tests that would fail because authentication is unavailable.
+
+---
+
+## Storage State Validation
+
+If a storageState exists but the application redirects back to the IBM login page:
+
+- assume the session has expired.
+- stop execution.
+- instruct the user to regenerate the storageState manually.
+- do not attempt to recreate authentication automatically.
+
+---
+
+## Manual Authentication Bootstrap
+
+If requested by the user, generate only a login.setup.ts file whose purpose is to save a storageState after the user manually completes MFA.
+
+The setup file should:
+
+- launch Chromium in headed mode
+- open the application
+- pause execution while waiting for manual authentication
+- resume after authentication completes
+- verify that the browser returned to the application
+- save
+
+playwright/.auth/user.json
+
+- exit successfully
+
+Do not perform any application testing inside login.setup.ts.
+
+---
+
+## Browser
+
+Use Chromium.
+
+Use headed mode for local execution.
+
+Use headless mode only inside CI.
+
+---
+
+## Selector Priority
+
+Always prefer:
+
+1. getByRole()
+2. getByLabel()
+3. getByPlaceholder()
+4. getByTestId()
+5. getByText()
+
+Avoid:
+
+- XPath
+- CSS classes
+- generated IDs
+- nth-child selectors
+- brittle DOM traversal
+
+---
+
+## Waiting Strategy
+
+Never use:
+
+waitForTimeout()
+
+Instead use:
+
+- expect(locator).toBeVisible()
+- expect(locator).toHaveText()
+- expect(locator).toBeEnabled()
+- page.waitForURL() when appropriate
+- locator.waitFor()
+
+Wait only for observable application state.
+
+---
+
+## Test Quality
+
+Generated tests must be:
+
+- deterministic
+- idempotent
+- independent
+- readable
+- maintainable
+
+Tests must never depend on execution order.
+
+Whenever possible:
+
+- create their own data
+- clean up created data
+
+---
+
+## Assertions
+
+Every test should verify meaningful business behavior.
+
+Avoid assertions that merely confirm navigation.
+
+---
+
+## Output
+
+Generate clean TypeScript using @playwright/test.
+
+Do not generate unnecessary helper functions.
+
+Reuse existing fixtures when available.
+
+Keep tests concise, readable and production-quality.
+```
+
+3. First test as an example
+
+```markdown
+please, navigate to the page https://erickwendel.github.io/vanilla-js-web-app-example/ and:
+
+    Generate tests for submiting the form and checking that the list was updated
+    Generate tests for form validation	
+```
+
+
+
+
+
+#### Preenchendo Forms
+
+Podemos pedir para o playwright também preencher informações!
+
+```markdown
+Navegue até o formulário https://forms.gle/5mGHXVKDLMFtjwBz7 e veja quais campos são necessários o preenchimento.
+
+Então navegue até a página do palestrante em https://sessionize.com/erickwendel, obtenha todos os dados do perfil que o formulário pede a partir desta página e então escolha uma palestra em portugues que tenha javascript no titulo e preencha o formulário. Não aperte o botão submit pois quero validar o processo. Garanta que todas as informações são em português do site sessionize.
+```
+
+
+
+Quando mais contexto dermos ao prompt, mas ele poderá fazer!
+
+
+
+### Context7
+
+Alguns LLMs não possuem um conteúdo atualizado (foi treinado até uma certa data), e a partir daí libs/linguagens mudam e a IA sugere coisas antigas... 
+
+O **Context7** é um servidor MCP que trás informações ATUALIZADAS e coloca no meio do prompt!
+
+> *Deixa o Agent codar, mas obriga ele consultar documentação atualizada*
+
+
+Como funciona?
+
+1. Usuário digita o prompt e pede "*use o context7*"
+2. MCP Context7 irá buscar a doc atualizada da sua linguagem
+3. Indexa toda doc e retorna o conteúdo baseado na sua pergunta
+
+
+
+Exemplo
+```markdown
+# Estrutura de Prompt (demo simples: Next.js + Better Auth + GitHub + SQLite + npm)
+
+## 1) Contexto da tarefa
+Você é um(a) dev fullstack sênior. Sua missão é gerar um projeto DEMO extremamente simples em Next.js (App Router) com:
+- Página de Login/Signup via GitHub (um único botão "Entrar com GitHub" com ícone do GitHub).
+- Página Home ("Hello World") que mostra o estado: "Logado como <email/nome>" OU "Você não está logado".
+- Banco SQLite local (arquivo .sqlite) para persistir usuários/sessões.
+- Implementação usando Better Auth (oficial) e integração oficial com Next.js.
+- Gerar também um README.md com instruções claras para rodar.
+- UI simples e bonita com Tailwind CSS e ícone SVG do GitHub.
+
+## 2) Contexto de tom
+Direto, didático e enxuto. Explique só o essencial para rodar o demo localmente.
+
+## 3) Dados de antecedentes, documentos e imagens
+Você TEM acesso a MCPs no VS Code, e DEVE usar o Context7 MCP.
+Regra crítica:
+- Se o Context7 MCP não estiver disponível/funcionando, PARE o processo imediatamente e responda apenas:
+  “Context7 MCP não disponível. Não posso continuar.”
+
+Regras de consulta:
+- Use o Context7 para buscar a documentação ATUAL do Better Auth sobre:
+  - Integração com Next.js (App Router / route handler)
+  - Configuração do provider GitHub
+  - Uso de SQLite (driver recomendado / configuração com better-sqlite3)
+  - Como criar auth client e iniciar sign-in social no client
+  - Migração de schema do banco de dados
+- Antes do código, mostre:
+  - “Docs consultados:” + títulos das páginas
+  - até 8–10 linhas totais de snippets (curtos) usados como base
+
+## 4) Descrição detalhada da tarefa e regras
+Gere o código e os arquivos mínimos para o demo funcionar, sem passos desnecessários.
+
+Requisitos técnicos:
+- Next.js App Router + TypeScript.
+- Gerenciador: npm (obrigatório).
+- Dependências: liste e instale apenas o necessário.
+- Better Auth configurado com:
+  - GitHub OAuth (clientId/clientSecret via env)
+  - Better Auth SQLite para persistência local usando better-sqlite3.
+  - IMPORTANTE: Use `new Database("./better-auth.sqlite")` diretamente, NÃO use provider/url.
+  - Execute `npx @better-auth/cli migrate` após criar os arquivos para gerar as tabelas do banco.
+- Inicie o projeto e valide com o Playwright MCP que o serviço está functionando na porta correta.
+
+Comportamento esperado:
+- Clicar “Entrar com GitHub” inicia OAuth e redireciona.
+- Após login, Home mostra dados do usuário/sessão.
+- Botão “Sair” encerra a sessão.
+
+## 8) Pensar passo a passo / respirar fundo
+Pense passo a passo internamente para evitar erros de caminhos/exports/imports.
+NÃO mostre seu raciocínio. Mostre apenas o resultado final.
+
+## 9) Formatação da saída
+Responda em português e siga EXATAMENTE esta ordem:
+
+1) Verificação do Context7 (1 linha: “Context7 OK” ou a mensagem de parada)
+2) Docs consultados (títulos + snippets curtos)
+3) Dependências (lista curta)
+4) Estrutura de arquivos criados (lib/auth.ts, app/api/auth/[...all]/route.ts, etc)
+5) Comandos npm (na ordem: instalar dependências, rodar migrate, rodar dev)
+```
+
+
+
+
 
 
 
