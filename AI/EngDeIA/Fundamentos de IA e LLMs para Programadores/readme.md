@@ -1085,7 +1085,27 @@ Como funciona?
 
 
 
-Exemplo
+Como gerar APIKEY:
+
+1. Acesse https://context7.com/dashboard
+2. Click em CREATE API KEY
+3. Copie a APIKEY e cole na sua IDE com MCP Context7
+
+```json
+"context7": {
+      "command": "npx",
+      "args": [
+          "-y",
+          "@upstash/context7-mcp",
+          "--api-key",
+          "YOUR_API_KEY"
+      ]
+}
+```
+
+
+
+Exemplo:
 ```markdown
 # Estrutura de Prompt (demo simples: Next.js + Better Auth + GitHub + SQLite + npm)
 
