@@ -1175,6 +1175,253 @@ Responda em português e siga EXATAMENTE esta ordem:
 
 
 
+## Ollama
+
+Existem alguns modelos OpenSource (sem censura) que nos permitem executar buscas/respostas que modelos 'fechados' (com pesos e censuras) não responderiam!
+
+* Exemplo, caso você peça para a LLM ensinar a construir algum tipo de 'trapaça' para jogos, o modelo irá informar que não pode ajudar
+
+
+
+Para executar modelos opensource, temos o **`ollama`** !
+
+* É gratuito (não cobra por token)
+* Flexível, permite baixar vários tipos de modelos
+* Interface amigável
+* Roda localmente
+
+
+
+> Para ambientes de produção **não é recomendado o uso do [Ollama](https://ollama.com/), mas sim do [VLLM](https://vllm.ai/)**
+
+
+
+Instalação
+```bash
+curl -fsSL https://ollama.com/install.sh | sh
+```
+
+
+
+Com o `ollama` rodando, precisamos escolher os modelos que podem ser definidos por alguns critérios:
+
+* **parâmetros:** é o peso do modelo, que indica o quanto ele aprendeu (120B, 20B, XM)
+  * 20B roda em um pc de 16GB
+  * 120B roda em 80GB de RAM
+* **contexto**: é a memória RAM que podem ser processadas por vez (32K, 128K, 1M Tokens)
+* **quantização:** é o processo que reduz o peso do modelo - modelos quantizados reduzem o gasto de token mas também perdem qualidade
+
+
+
+![IA Off-Line com Ollama – Guia rápido – Code4Delphi](../imageResource/ollama-03.png)
+
+## OpenRouter
+
+[OpenRouter](https://openrouter.ai/) é um sistema que unifica vários provedores (chatGPT, Claude, Gemini)
+
+* Cobrança concentrada em 1 lugar
+* 1 único endpoint
+* Aplicação fala com o OpenRouter e o OpenRouter seleciona os provedores
+
+
+
+Via APIs, podemos chamar o OpenRouter e ele então irá selecionar o modelo 
+
+```bash
+source .env
+
+API_URL="https://openrouter.ai/api/v1/chat/completions"
+OPENROUTER_SITE_URL=http://localhost:3000
+OPENROUTER_SITE_NAME="My Example"
+
+NLP_MODEL="google/gemma-3-27b-it:free"
+
+curl --silent -X POST "$API_URL" \
+-H "Content-Type: applicaton/json" \
+-H "Authorization: Bearer $OPENROUTER_API_KEY" \
+-H "HTTP-Referer: $OPENROUTER_SITE_URL" \
+-H "X-Title: $OPENROUTER_SITE_NAME" \
+-d '
+    {
+        "model": '"'$NLP_MODEL'"',
+        "messages": [
+            {
+                "role":"user",
+                "content":"Me conte uma curiosidade sobre LLMs"
+            }
+        ],
+        "temperature": 0.3,
+        "max_tokens": 1000
+}' | jq
+```
+
+
+
+
+
+## RAG
+
+RAG (**R**etrieval **A**ugmented **G**eneration)...
+
+
+
+Antes da resposta da LLM vir, acontece um **step fundamental**, busca por **informações relevantes, já pré configuradas!**
+
+* Ao invés do modelo depender do que ja foi aprendido, ele passa a ter informação adicional
+  * ***Memória Paramétrica:*** aquilo que o modelo ja sabe
+  * ***Não paramétrica:*** índice vetorial, aquilo que o modelo não sabe
+* Conhecimento privado!
+
+
+
+Relembrando alguns conceitos:
+
+* **Transformers:**
+  * **Attention:** é através do transformers que a LLM consegue ver o contexto por completo!
+  * Problema? pode ser q o modelo n saiba, e gere uma resposta **plausível mas errada!**
+
+Antes (RNN):
+
+```
+Eu -> fui -> ao -> mercado -> ontem
+```
+
+O modelo precisava ler palavra por palavra.
+
+Com Transformer:
+
+```
+Eu ------\
+fui ------\
+ao ---------> "Attention"
+mercado --/
+ontem ----/
+```
+
+Todas as palavras podem influenciar umas às outras.
+
+
+
+* **Embedding**:
+  * Ao invés de armazenar o texto, é utilizado **vetores numéricos**
+
+Ao invés de armazenar:
+
+```
+"Comprei uma bicicleta"
+```
+
+o modelo transforma em algo parecido com:
+
+```
+[0.23,
+-0.81,
+0.14,
+...
+0.55]
+```
+
+
+
+Com embedding a busca deixar de ser por CTRL + F, e se torna uma **busca por semântica**, por valores próximos!
+
+
+
+
+
+Mas como funciona no RAG?
+
+1. **Indexação**: Ao coletar PDFs, tickets, tabelas, convertemos em ***chunks***, onde cada pedaço recebe um ***embedding (vetor numérico)*** armazenado em um banco vetorial
+2. **Consulta:** Após o usuário enviar a pergunta, a pergunta tbm vira um vetor numérico, e então o sistema busca embeddings mais similares no banco vetorial
+
+```Documentos
+Documentos
+↓
+quebrar em pedaços (chunks)
+↓
+gerar embeddings
+↓
+guardar em um banco vetorial
+↓
+Usuário pergunta
+↓
+embedding da pergunta
+↓
+procurar vetores parecidos
+↓
+enviar documentos para a LLM
+↓
+Resposta
+```
+
+
+
+![What is Retrieval-Augmented Generation (RAG) - GeeksforGeeks](../imageResource/rag.webp)
+
+
+
+### Neo4j
+
+Neo4j armazena vetores numéricos, mas é um **banco de grafos!**
+
+Ao invés de armazenar tabelas, é armazenado grafos, que possuem relacionamento entre as entidades
+
+                Transformer
+                     │
+                     ▼
+             gera Embeddings
+                     │
+                     ▼
+         Banco Vetorial (Qdrant, pgvector, Pinecone...)
+                     │
+      recupera documentos relevantes
+                     │
+                     ▼
+                  RAG
+                     │
+                     ▼
+                 LLM responde
+                +----------------+
+                |                |
+                ▼                ▼
+          Neo4j (grafo)     Documentos
+      (relacionamentos)     (texto)
+                │                │
+                └──── Graph RAG ─┘
+
+
+
+```python
+def answer(question, user):
+
+    # 1. Busca semântica
+    docs = vector_store.search(question)
+
+    # 2. Busca no grafo
+    permissions = graph.query("""
+        MATCH (u:User {name:$user})
+              -[:HAS_PERMISSION]->(p)
+        RETURN p.name
+    """, user=user)
+
+    # 3. Monta o contexto
+    prompt = f"""
+    Documentation:
+    {docs}
+
+    User permissions:
+    {permissions}
+
+    Question:
+    {question}
+    """
+
+    # 4. Geração da resposta
+    return llm.invoke(prompt)
+```
+
+
+
 
 
 # Avaliação
@@ -1184,7 +1431,7 @@ Responda em português e siga EXATAMENTE esta ordem:
 **O que é RAG (Retrieval-Augmented Generation)?**
 
 - A) Uma técnica que elimina a necessidade de embeddings usando apenas busca por palavra-chave.
-- B) Um padrão em que o sistema busca informação externa relevante e injeta trechos no contexto antes da LLM responder.
+- **B) Um padrão em que o sistema busca informação externa relevante e injeta trechos no contexto antes da LLM responder.**
 - C) Um método de aumentar a criatividade do texto ajustando temperature, Top-K e Top-P.
 - D) Um ajuste nos pesos do modelo para ele “aprender” um domínio novo permanentemente.
 - E) Um protocolo para executar ações no ambiente (rodar testes, abrir PR, fazer deploy).
@@ -1197,7 +1444,7 @@ Responda em português e siga EXATAMENTE esta ordem:
 
 - A) Um método de escolher a categoria final pelo maior valor (argmax).
 - B) Um tipo de banco de dados otimizado para machine learning.
-- C) Uma lista/matriz de números usada como base para algoritmos aprenderem padrões.
+- **C) Uma lista/matriz de números usada como base para algoritmos aprenderem padrões.**
 - D) Uma técnica de geração de texto usada por LLMs (sampling).
 - E) Um objeto JavaScript com propriedades (ex.: `{ idade, cor, localizacao }`).
 
@@ -1211,7 +1458,7 @@ Responda em português e siga EXATAMENTE esta ordem:
 - B) Backpropagation, pois ajusta pesos com base no erro.
 - C) Regularização, pois evita overfitting automaticamente.
 - D) Decoding, pois escolhe a saída mais provável.
-- E) One-hot encoding (categorização), pois representa categorias discretas com 0/1.
+- **E) One-hot encoding (categorização), pois representa categorias discretas com 0/1.**
 
 ---
 
@@ -1222,7 +1469,7 @@ Responda em português e siga EXATAMENTE esta ordem:
 - A) Converter imagens em texto e treinar um Transformer para prever tokens.
 - B) Ordenar tokens por probabilidade com Top-K e Top-P.
 - C) Misturar soluções em uma população usando cruzamento e mutação.
-- D) Tentativa e erro, recebendo recompensas e punições conforme o resultado.
+- **D) Tentativa e erro, recebendo recompensas e punições conforme o resultado.**
 - E) Repetir exemplos rotulados (entrada/saída) até "decorar" o padrão.
 
 ---
@@ -1231,7 +1478,7 @@ Responda em português e siga EXATAMENTE esta ordem:
 
 **O que é self-attention em Transformers?**
 
-- A) Um mecanismo em que cada token atribui pesos a outros tokens da mesma sequência.
+- **A) Um mecanismo em que cada token atribui pesos a outros tokens da mesma sequência.**
 - B) Uma técnica para ordenar embeddings sem usar informação de posição.
 - C) Uma regra que sempre escolhe o token de maior probabilidade (greedy).
 - D) Um truque para reduzir o número de tokens e caber em 4k tokens.
@@ -1245,7 +1492,7 @@ Responda em português e siga EXATAMENTE esta ordem:
 
 - A) Aumentar a temperatura para deixar a busca mais criativa.
 - B) Ajustar a querie para o mais próximo da pergunta do usuário.
-- C) Ajustar o top-K para retornar menos resultados por consulta.
+- **C) Ajustar o top-K para retornar menos resultados por consulta.**
 - D) Remover o índice vetorial para reduzir o custo computacional.
 - E) Diminuir o número de tokens do prompt da LLM.
 
@@ -1256,7 +1503,7 @@ Responda em português e siga EXATAMENTE esta ordem:
 **Na aula, MCP (Model Context Protocol) é apresentado como:**
 
 - A) Um modelo de linguagem treinado para programar em várias linguagens.
-- B) Um padrão para plugar ferramentas e dados em clientes de IA compatíveis.
+- **B) Um padrão para plugar ferramentas e dados em clientes de IA compatíveis.**
 - C) Um banco vetorial para guardar embeddings e fazer busca por similaridade.
 - D) Um método de buscar chunks e inserir no prompt antes de responder (RAG).
 - E) Uma técnica de treinar o modelo com exemplos do domínio (fine-tuning).
@@ -1268,7 +1515,7 @@ Responda em português e siga EXATAMENTE esta ordem:
 **Segundo a aula, por que o Neo4j pode ser usado como vector database?**
 
 - A) Porque ele já vem com uma LLM embutida para gerar respostas.
-- B) Porque ele armazena chunks como nós, embeddings como propriedades e permite índice/consulta vetorial.
+- **B) Porque ele armazena chunks como nós, embeddings como propriedades e permite índice/consulta vetorial.**
 - C) Porque ele exige cloud e chave de API para funcionar corretamente.
 - D) Porque ele converte automaticamente PDFs em chunks sem nenhum código.
 - E) Porque ele substitui embeddings por busca de palavra-chave otimizada.
@@ -1288,7 +1535,7 @@ Qual alternativa está mais correta?
 - A) I é falsa e II é verdadeira: só o Transformer gera vetores numéricos.
 - B) I e II são falsas: a semântica depende apenas do decoding (Top-P/Top-K).
 - C) I é verdadeira e II é falsa: ambiguidade é resolvida pela tokenização.
-- D) I e II são verdadeiras: embeddings são base; Transformer contextualiza.
+- **D) I e II são verdadeiras: embeddings são base; Transformer contextualiza.**
 - E) I é verdadeira e II é falsa: embeddings já carregam o contexto completo.
 
 ---
@@ -1303,6 +1550,6 @@ Qual alternativa está mais correta?
 
 - A) Top-K, pois limita as palavras possíveis para "ela" no texto.
 - B) Tokenização, pois define quem é o sujeito pela separação em tokens.
-- C) Self-attention, pois pesa tokens relevantes para resolver a referência.
+- **C) Self-attention, pois pesa tokens relevantes para resolver a referência.**
 - D) Temperature, pois aumenta a chance de escolher "Maria" como resposta.
 - E) Embeddings posicionais, pois sozinho determina a quem "ela" aponta.
