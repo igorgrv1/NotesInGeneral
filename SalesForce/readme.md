@@ -33,6 +33,10 @@ sfdx force:auth:web:login -a igorromero -d
 
 sfdx force:auth:web:login -a CSPProd -r https://login.salesforce.com
 sfdx force:auth:web:login -a merlindev1 -r https://ibmsf--merlindev1.sandbox.my.salesforce.com
+sf org login web --alias test1 --instance-url https://ibmsf--test1.sandbox.my.salesforce.com 
+
+
+sf config set target-org test1
 
 old way
 sfdx force:auth:web:login --alias igorromero --instance-url https://igorromero.my.salesforce.com
@@ -157,9 +161,9 @@ sfdx force:apex:test:run --tests WorkPrioritizationUserServicesTest -c -r human 
 
 sfdx force:apex:test:run --tests WorkPrioritizationUserServicesTest.testQueryAllCountries -c -r human --wait 10
 
-sf apex run test --tests WorkPrioritizationUserServicesTest --code-coverage --detailed-coverage --result-format human
+sf apex run test --tests WorkPrioritizationUserServicesTest --code-coverage --detailed-coverage --result-format human  --wait 10
 
-sf apex run test --tests WorkPrioritizationUserServicesTest.testQueryAllCountries --code-coverage --result-format human
+sf apex run test --tests WorkPrioritizationUserServicesTest.testQueryAllCountries --code-coverage --result-format human  --wait 10
 
 sf apex run test --tests WorkPrioritizationUserServicesTest.testQueryAllCountries WorkPrioritizationUserServicesTest.testQueryAgentAvailableAccounts --code-coverage --result-format human
 ```
